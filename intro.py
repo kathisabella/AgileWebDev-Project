@@ -1,2 +1,2 @@
 def favourite_food:
-return []
+return ['Chicken']
