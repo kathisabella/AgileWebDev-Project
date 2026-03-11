@@ -1,2 +1,3 @@
 def favourite_food:
-return [icecream]
+return [icecream, fried_rice]
+
