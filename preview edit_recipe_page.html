@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Plateful — Edit Recipe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+:root {
+  --color-bg:#FFFDF0;
+  --color-surface:#FFF2C2;
+  --color-surface-alt:#EFF3EA;
+  --color-sage:#D9DFC6;
+  --color-text:#3a3224;
+  --color-muted:#7a6e5f;
+  --color-accent:#6e7d52;
+  --danger:#b84a3a;
+  --font-head:'Fraunces', serif;
+  --font-ui:'Figtree', sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-ui);background:var(--color-bg);color:var(--color-text)}
+.wrapper{display:flex;height:100vh}
+
+.sidebar{width:210px;background:var(--color-sage);padding:24px}
+.sidebar a{display:block;padding:8px;border-radius:8px;color:var(--color-text)}
+.sidebar a.active{background:#bac4a5}
+
+.main{flex:1;display:flex;flex-direction:column}
+.topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--color-sage)}
+.content{padding:24px;overflow:auto}
+
+.form-card{
+  max-width:760px;
+  margin:auto;
+  background:#fff;
+  border:1px solid #e3dac0;
+  border-radius:14px;
+  padding:20px;
+}
+
+h1{font-family:var(--font-head);font-size:1.5rem;margin-bottom:10px}
+.sub{font-size:0.8rem;color:var(--color-muted);margin-bottom:16px}
+
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:0.8rem;margin-bottom:4px;color:var(--color-muted)}
+
+input, select, textarea{
+  width:100%;
+  padding:8px 10px;
+  border-radius:8px;
+  border:1px solid var(--color-sage);
+  font-size:0.8rem;
+  font-family:var(--font-ui);
+}
+
+textarea{resize:vertical}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+.list-input{display:flex;flex-direction:column;gap:6px}
+.item-row{display:flex;gap:6px}
+.remove-btn{
+  background:#fff;
+  border:1px solid #e3dac0;
+  border-radius:8px;
+  padding:6px 8px;
+  font-size:0.7rem;
+  cursor:pointer;
+}
+
+.add-btn{margin-top:6px;font-size:0.75rem;color:var(--color-accent);cursor:pointer}
+
+.image-preview{
+  height:160px;
+  border-radius:10px;
+  background:var(--color-surface-alt);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:8px;
+  font-size:2rem;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:18px;
+}
+
+.btn{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.btn.save{background:var(--color-text);color:#fff}
+.btn.delete{background:var(--danger);color:#fff}
+
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<aside class="sidebar">
+  <h2>Plateful</h2>
+  <a href="#">Home</a>
+  <a href="#">Explore</a>
+  <a href="#" class="active">Edit Recipe</a>
+</aside>
+
+<main class="main">
+
+<header class="topbar">
+  <div>Edit Recipe</div>
+  <div style="font-size:0.75rem;color:var(--color-muted)">Last updated: 2 days ago</div>
+</header>
+
+<div class="content">
+
+<div class="form-card">
+  <h1>Edit your recipe</h1>
+  <p class="sub">Update details, ingredients, and steps anytime.</p>
+
+  <div class="form-group">
+    <label>Recipe Title</label>
+    <input type="text" value="Spicy Miso Ramen" />
+  </div>
+
+  <div class="row">
+    <div class="form-group">
+      <label>Cuisine</label>
+      <select>
+        <option selected>Japanese</option>
+        <option>Italian</option>
+        <option>Indian</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Difficulty</label>
+      <select>
+        <option>Easy</option>
+        <option selected>Medium</option>
+        <option>Hard</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="form-group">
+      <label>Prep Time</label>
+      <input type="text" value="25 min" />
+    </div>
+    <div class="form-group">
+      <label>Servings</label>
+      <input type="number" value="2" />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Description</label>
+    <textarea rows="3">A rich and comforting bowl of ramen with spicy miso broth and fresh toppings.</textarea>
+  </div>
+
+  <div class="form-group">
+    <label>Ingredients</label>
+    <div class="list-input">
+      <div class="item-row"><input type="text" value="200g ramen noodles" /><button class="remove-btn">✕</button></div>
+      <div class="item-row"><input type="text" value="2 tbsp miso paste" /><button class="remove-btn">✕</button></div>
+      <div class="item-row"><input type="text" value="1 tsp chili paste" /><button class="remove-btn">✕</button></div>
+    </div>
+    <div class="add-btn">+ Add ingredient</div>
+  </div>
+
+  <div class="form-group">
+    <label>Steps</label>
+    <div class="list-input">
+      <div class="item-row"><textarea rows="2">Boil noodles according to instructions.</textarea><button class="remove-btn">✕</button></div>
+      <div class="item-row"><textarea rows="2">Prepare broth with miso and chili paste.</textarea><button class="remove-btn">✕</button></div>
+    </div>
+    <div class="add-btn">+ Add step</div>
+  </div>
+
+  <div class="form-group">
+    <label>Recipe Image</label>
+    <div class="image-preview">🍜</div>
+    <input type="file" />
+  </div>
+
+  <div class="actions">
+    <button class="btn save">Save Changes</button>
+    <button class="btn delete">Delete Recipe</button>
+  </div>
+
+</div>
+
+</div>
+</main>
+</div>
+</body>
+</html>
