@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Plateful — Recipe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+:root {
+  --color-bg:#FFFDF0;
+  --color-surface:#FFF2C2;
+  --color-surface-alt:#EFF3EA;
+  --color-sage:#D9DFC6;
+  --color-text:#3a3224;
+  --color-muted:#7a6e5f;
+  --color-faint:#aaa090;
+  --color-accent:#6e7d52;
+  --font-head:'Fraunces', serif;
+  --font-ui:'Figtree', sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-ui);background:var(--color-bg);color:var(--color-text)}
+.wrapper{display:flex;height:100vh}
+
+/* Sidebar */
+.sidebar{width:210px;background:var(--color-sage);padding:24px}
+.sidebar a{display:block;padding:8px;border-radius:8px;color:var(--color-text)}
+.sidebar a.active{background:#bac4a5}
+
+.main{flex:1;display:flex;flex-direction:column}
+.topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--color-sage)}
+.content{padding:24px;overflow:auto}
+
+/* Layout */
+.recipe-layout{
+  display:grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap:28px;
+}
+
+/* Header */
+.recipe-header h1{
+  font-family:var(--font-head);
+  font-size:1.8rem;
+  margin-bottom:6px;
+}
+.recipe-meta{font-size:0.8rem;color:var(--color-muted);margin-bottom:12px}
+
+.actions{
+  display:flex;
+  gap:10px;
+  margin-bottom:18px;
+}
+.btn{
+  padding:6px 12px;
+  border-radius:8px;
+  border:1px solid var(--color-sage);
+  background:#fff;
+  font-size:0.75rem;
+  cursor:pointer;
+}
+.btn.primary{
+  background:var(--color-text);
+  color:#fff;
+}
+
+/* Image */
+.recipe-image{
+  height:220px;
+  border-radius:12px;
+  background:var(--color-surface-alt);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:3rem;
+  margin-bottom:18px;
+}
+
+/* Sections */
+.section{margin-bottom:22px}
+.section h3{
+  font-family:var(--font-head);
+  font-size:1rem;
+  margin-bottom:8px;
+}
+
+.ingredients li,
+.steps li{
+  font-size:0.82rem;
+  margin-bottom:6px;
+}
+
+.steps li{margin-bottom:10px}
+
+/* Right panel */
+.side-card{
+  background:var(--color-surface);
+  border:1px solid #d8d0b0;
+  border-radius:12px;
+  padding:14px;
+  margin-bottom:16px;
+}
+
+.rating{
+  font-size:1.2rem;
+  margin-bottom:6px;
+}
+
+/* Comments */
+.comment{
+  border-bottom:1px solid #e6dcc8;
+  padding:8px 0;
+}
+.comment strong{font-size:0.8rem}
+.comment p{font-size:0.78rem;color:var(--color-muted)}
+
+.comment-box textarea{
+  width:100%;
+  border-radius:8px;
+  border:1px solid var(--color-sage);
+  padding:8px;
+  font-size:0.75rem;
+}
+
+
+/* Pretty description */
+.desc-card{
+  background: linear-gradient(135deg, #fff7d6, #f4f7ef);
+  border:1px solid #e3dac0;
+  border-radius:12px;
+  padding:14px 16px;
+  position:relative;
+}
+.desc-card::before{
+  content:"“";
+  position:absolute;
+  top:-8px;
+  left:10px;
+  font-size:2rem;
+  color:var(--color-accent);
+  opacity:0.4;
+}
+.desc-text{
+  font-size:0.85rem;
+  color:var(--color-text);
+  line-height:1.6;
+}
+.desc-tags{
+  margin-top:8px;
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.desc-tag{
+  font-size:0.7rem;
+  padding:2px 8px;
+  border-radius:999px;
+  background:#ffffffaa;
+  border:1px solid var(--color-sage);
+  color:var(--color-muted);
+}
+
+/* Ingredients */
+.ing-card{
+  background:#fff;
+  border:1px solid #e3dac0;
+  border-radius:12px;
+  padding:14px 16px;
+}
+.ing-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.ing-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:0.82rem;
+}
+.ing-item input{accent-color:var(--color-accent);cursor:pointer}
+
+/* Steps */
+.steps-card{
+  background:linear-gradient(135deg,#fdf7dc,#eef3e7);
+  border:1px solid #e3dac0;
+  border-radius:12px;
+  padding:14px 16px;
+}
+.step{
+  display:flex;
+  gap:10px;
+  margin-bottom:12px;
+}
+.step-num{
+  width:24px;height:24px;
+  border-radius:50%;
+  background:var(--color-accent);
+  color:#fff;
+  font-size:0.75rem;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.step-text{
+  font-size:0.82rem;
+  line-height:1.5;
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<aside class="sidebar">
+  <h2>Plateful</h2>
+  <a href="#">Home</a>
+  <a href="#">Explore</a>
+  <a href="#" class="active">Recipe</a>
+</aside>
+
+<main class="main">
+
+<header class="topbar">
+  <div>Recipe Details</div>
+</header>
+
+<div class="content">
+
+<div class="recipe-layout">
+
+<!-- LEFT -->
+<div>
+
+<div class="recipe-header">
+  <h1>Spicy Miso Ramen</h1>
+  <div class="recipe-meta">Japanese • 25 min • Medium • by @noodlelover</div>
+</div>
+
+<div class="actions">
+  <button class="btn primary">⭐ Save</button>
+  <button class="btn">🔗 Share</button>
+</div>
+
+<div class="recipe-image">🍜</div>
+
+<div class="section">
+  <h3>Description</h3>
+  <div class="desc-card">
+    <p class="desc-text">
+      A rich and comforting bowl of ramen with a deep umami-packed miso broth, gentle heat from chili, and perfectly chewy noodles. Finished with a soft egg and fresh toppings, this dish is both cozy and bold — perfect for a chilly evening.
+    </p>
+    <div class="desc-tags">
+      <span class="desc-tag">🌶️ Spicy</span>
+      <span class="desc-tag">🍜 Comfort</span>
+      <span class="desc-tag">⏱️ Quick meal</span>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Ingredients</h3>
+  <div class="ing-card">
+    <div class="ing-list">
+      <label class="ing-item"><input type="checkbox" /> 200g ramen noodles</label>
+      <label class="ing-item"><input type="checkbox" /> 2 tbsp miso paste</label>
+      <label class="ing-item"><input type="checkbox" /> 1 tsp chili paste</label>
+      <label class="ing-item"><input type="checkbox" /> 2 cups chicken broth</label>
+      <label class="ing-item"><input type="checkbox" /> Soft-boiled egg</label>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Steps</h3>
+  <div class="steps-card">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text">Boil noodles according to instructions until perfectly tender.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text">Prepare broth by mixing miso and chili paste into hot stock.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text">Add noodles to broth and simmer briefly to absorb flavor.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-text">Serve hot with egg and your favorite toppings.</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- RIGHT -->
+<div>
+
+<div class="side-card">
+  <div class="rating">⭐ 4.8 / 5</div>
+  <div style="font-size:0.75rem;color:var(--color-muted)">124 ratings</div>
+</div>
+
+<div class="side-card">
+  <h3 style="margin-bottom:6px">Comments</h3>
+
+  <div class="comment">
+    <strong>@foodie_ara</strong>
+    <p>Absolutely loved this, super flavorful!</p>
+  </div>
+
+  <div class="comment">
+    <strong>@chefmarcus</strong>
+    <p>Great balance of spice and umami.</p>
+  </div>
+
+  <div class="comment-box">
+    <textarea rows="3" placeholder="Leave a comment..."></textarea>
+  </div>
+
+</div>
+
+<div class="side-card">
+  <h3 style="margin-bottom:6px">Similar Recipes</h3>
+  <p style="font-size:0.78rem;color:var(--color-muted)">Tonkotsu Ramen • Udon Soup • Pho</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+</main>
+</div>
+</body>
+</html>
