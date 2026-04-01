@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Plateful — Explore</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+:root {
+  --color-bg:#FFFDF0;
+  --color-surface:#FFF2C2;
+  --color-surface-alt:#EFF3EA;
+  --color-sage:#D9DFC6;
+  --color-text:#3a3224;
+  --color-muted:#7a6e5f;
+  --color-faint:#aaa090;
+  --color-accent:#6e7d52;
+  --font-head:'Fraunces', serif;
+  --font-ui:'Figtree', sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-ui);background:var(--color-bg);color:var(--color-text)}
+.wrapper{display:flex;height:100vh}
+
+/* Sidebar reused */
+.sidebar{width:210px;background:var(--color-sage);padding:24px}
+.sidebar a{display:block;padding:8px;border-radius:8px;color:var(--color-text)}
+.sidebar a.active{background:#bac4a5}
+
+.main{flex:1;display:flex;flex-direction:column}
+
+.topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--color-sage)}
+
+.content{padding:24px;overflow:auto}
+
+.page-title h2{font-family:var(--font-head);font-size:1.4rem}
+.page-title p{font-size:0.85rem;color:var(--color-muted)}
+
+/* Search + Filters */
+.search-section{margin:20px 0}
+.search-bar{
+  display:flex;
+  gap:10px;
+  margin-bottom:14px;
+}
+.search-bar input{
+  flex:1;
+  padding:10px 14px;
+  border-radius:999px;
+  border:1px solid var(--color-sage);
+  background:var(--color-surface-alt);
+}
+
+.filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.filter{
+  padding:6px 12px;
+  border-radius:999px;
+  border:1px solid var(--color-sage);
+  background:#fff;
+  font-size:0.75rem;
+  cursor:pointer;
+}
+.filter.active{background:var(--color-accent);color:#fff}
+
+/* Layout */
+.explore-layout{
+  display:grid;
+  grid-template-columns:220px 1fr;
+  gap:24px;
+}
+
+/* Sidebar filters */
+.filter-panel{
+  background:var(--color-surface);
+  border:1px solid #d8d0b0;
+  border-radius:12px;
+  padding:16px;
+}
+
+.filter-group{margin-bottom:16px}
+.filter-group h4{
+  font-size:0.8rem;
+  margin-bottom:6px;
+}
+.filter-group label{
+  display:block;
+  font-size:0.75rem;
+  margin-bottom:4px;
+}
+
+/* Recipes */
+.recipe-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.recipe-card{
+  border:1px solid #d6d0b2;
+  border-radius:10px;
+  overflow:hidden;
+  background:#fff;
+}
+.recipe-thumb{
+  height:100px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:2rem;
+  background:var(--color-surface-alt);
+}
+.recipe-body{padding:10px}
+.recipe-name{font-family:var(--font-head);font-size:0.9rem}
+.recipe-meta{font-size:0.75rem;color:var(--color-muted)}
+
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <h2>Plateful</h2>
+  <a href="#">Home</a>
+  <a href="#" class="active">Explore</a>
+  <a href="#">My Recipes</a>
+</aside>
+
+<!-- Main -->
+<main class="main">
+
+<header class="topbar">
+  <div>Explore Recipes</div>
+</header>
+
+<div class="content">
+
+<div class="page-title">
+  <h2>Find your next dish</h2>
+  <p>Search and filter recipes by taste, time, and ingredients.</p>
+</div>
+
+<div class="search-section">
+  <div class="search-bar">
+    <input type="text" placeholder="Search by keyword or ingredient..." />
+  </div>
+
+  <div class="filters">
+    <div class="filter active">All</div>
+    <div class="filter">Quick meals</div>
+    <div class="filter">Healthy</div>
+    <div class="filter">Comfort food</div>
+  </div>
+</div>
+
+<div class="explore-layout">
+
+<!-- LEFT FILTER PANEL -->
+<div class="filter-panel">
+
+  <div class="filter-group">
+    <h4>Cuisine</h4>
+    <label><input type="checkbox" /> Italian</label>
+    <label><input type="checkbox" /> Japanese</label>
+    <label><input type="checkbox" /> Indian</label>
+  </div>
+
+  <div class="filter-group">
+    <h4>Difficulty</h4>
+    <label><input type="checkbox" /> Easy</label>
+    <label><input type="checkbox" /> Medium</label>
+    <label><input type="checkbox" /> Hard</label>
+  </div>
+
+  <div class="filter-group">
+    <h4>Ingredients</h4>
+    <label><input type="checkbox" /> Chicken</label>
+    <label><input type="checkbox" /> Vegetarian</label>
+    <label><input type="checkbox" /> Seafood</label>
+  </div>
+
+</div>
+
+<!-- RESULTS -->
+<div>
+  <div class="recipe-grid">
+
+    <div class="recipe-card">
+      <div class="recipe-thumb">🍝</div>
+      <div class="recipe-body">
+        <div class="recipe-name">Creamy Carbonara</div>
+        <div class="recipe-meta">Italian • 25 min • Easy</div>
+      </div>
+    </div>
+
+    <div class="recipe-card">
+      <div class="recipe-thumb">🍣</div>
+      <div class="recipe-body">
+        <div class="recipe-name">Salmon Sushi Bowl</div>
+        <div class="recipe-meta">Japanese • 30 min • Medium</div>
+      </div>
+    </div>
+
+    <div class="recipe-card">
+      <div class="recipe-thumb">🍛</div>
+      <div class="recipe-body">
+        <div class="recipe-name">Chicken Curry</div>
+        <div class="recipe-meta">Indian • 40 min • Medium</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div>
+
+</div>
+</main>
+</div>
+</body>
+</html>
