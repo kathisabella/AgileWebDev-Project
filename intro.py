@@ -1,5 +1,3 @@
-def favourite_food:
+def favourite_food():
 
-
-return [icecream, fried_rice,Chicken]
-
+    return [icecream, fried_rice,Chicken,pizza]
