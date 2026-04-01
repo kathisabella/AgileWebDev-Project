@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plateful — Saved Recipes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+
+:root {
+  --color-bg:          #FFFDF0;
+  --color-surface:     #FFF2C2;
+  --color-surface-alt: #EFF3EA;
+  --color-sage:        #D9DFC6;
+  --color-text:        #3a3224;
+  --color-muted:       #7a6e5f;
+  --color-faint:       #aaa090;
+  --color-accent:      #6e7d52;
+  --font-head: 'Fraunces', Georgia, serif;
+  --font-ui:   'Figtree', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+a { color: var(--color-accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+ul { list-style: none; }
+
+/* ── Layout ── */
+.wrapper { display: flex; height: 100vh; overflow: hidden; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 210px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 14px 24px;
+  background: var(--color-sage);
+  border-right: 1px solid #c8d0b4;
+  overflow-y: auto;
+}
+.logo { padding: 0 10px; margin-bottom: 28px; }
+.logo h1 {
+  font-family: var(--font-head);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.3px;
+}
+.logo p { font-size: 0.72rem; color: var(--color-muted); margin-top: 2px; }
+
+.sidebar nav { display: flex; flex-direction: column; gap: 1px; }
+.sidebar nav a {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+  transition: background 0.12s;
+}
+.sidebar nav a:hover { background: #c8d0b4; text-decoration: none; }
+.sidebar nav a.active { background: #bac4a5; font-weight: 600; }
+.nav-divider { border: none; border-top: 1px solid #bdc7a8; margin: 10px 0; }
+
+.sidebar-user {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid #bdc7a8;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-left: 2px;
+}
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--color-accent); color: #fff;
+  font-size: 0.7rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sidebar-user .name { font-size: 0.83rem; font-weight: 600; color: var(--color-text); }
+.sidebar-user .handle { font-size: 0.7rem; color: var(--color-muted); margin-top: 1px; }
+
+/* ── Main ── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ── Topbar ── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; height: 60px;
+  border-bottom: 1px solid var(--color-sage);
+  background: var(--color-bg);
+  flex-shrink: 0;
+}
+.topbar-left { display: flex; align-items: baseline; gap: 10px; }
+.topbar-left span.hi { font-family: var(--font-head); font-size: 1rem; font-weight: 600; color: var(--color-text); }
+.topbar-left span.date { font-size: 0.78rem; color: var(--color-faint); }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.search-wrap { position: relative; }
+.search-wrap input {
+  padding: 6px 12px 6px 30px;
+  border: 1px solid var(--color-sage);
+  border-radius: 20px;
+  background: var(--color-surface-alt);
+  font-family: var(--font-ui); font-size: 0.8rem; color: var(--color-text);
+  width: 190px; outline: none; transition: border-color 0.15s, width 0.2s;
+}
+.search-wrap input::placeholder { color: var(--color-faint); }
+.search-wrap input:focus { border-color: var(--color-accent); width: 220px; }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--color-faint); font-size: 0.75rem; pointer-events: none; }
+.notif-btn {
+  position: relative; background: none; border: 1px solid var(--color-sage);
+  border-radius: 8px; padding: 5px 8px; cursor: pointer; font-size: 0.9rem; line-height: 1;
+  color: var(--color-muted); transition: background 0.12s;
+}
+.notif-btn:hover { background: var(--color-surface-alt); }
+.notif-badge {
+  position: absolute; top: -5px; right: -5px;
+  background: #b36b3a; color: #fff;
+  font-size: 0.58rem; font-weight: 700;
+  width: 15px; height: 15px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--color-bg);
+}
+.btn-upload {
+  padding: 6px 14px; background: var(--color-text); color: var(--color-surface) !important;
+  border-radius: 8px; font-size: 0.8rem; font-weight: 600; transition: opacity 0.15s; text-decoration: none !important;
+}
+.btn-upload:hover { opacity: 0.85; }
+
+/* ── Scrollable content ── */
+.content { flex: 1; overflow-y: auto; padding: 28px 28px 40px; }
+
+/* ── Page intro ── */
+.page-intro { margin-bottom: 24px; }
+.page-intro h2 { font-family: var(--font-head); font-size: 1.5rem; font-weight: 700; color: var(--color-text); margin-bottom: 4px; }
+.page-intro p { font-size: 0.85rem; color: var(--color-muted); }
+
+/* ── Collections row ── */
+.collections-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.collection-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid #d6d0b2;
+  background: #fff;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  font-size: 0.83rem;
+  font-weight: 500;
+  color: var(--color-text);
+  user-select: none;
+}
+.collection-chip:hover { background: var(--color-surface-alt); text-decoration: none; }
+.collection-chip.active {
+  background: var(--color-surface);
+  border-color: #b8a870;
+  font-weight: 600;
+}
+.collection-chip .chip-emoji { font-size: 1rem; }
+.collection-chip .chip-count {
+  font-size: 0.72rem;
+  color: var(--color-muted);
+  margin-left: 2px;
+}
+
+/* new collection button */
+.chip-new {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px dashed #b8b098;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.83rem;
+  font-weight: 500;
+  color: var(--color-muted);
+  transition: border-color 0.12s, color 0.12s;
+  font-family: var(--font-ui);
+}
+.chip-new:hover { border-color: var(--color-accent); color: var(--color-accent); text-decoration: none; }
+
+/* ── Toolbar (sort + view toggle) ── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.toolbar-left { display: flex; align-items: center; gap: 8px; }
+.toolbar-left span { font-size: 0.82rem; color: var(--color-muted); }
+.sort-select {
+  padding: 5px 10px;
+  border: 1px solid var(--color-sage);
+  border-radius: 8px;
+  background: var(--color-bg);
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--color-text);
+  outline: none;
+  cursor: pointer;
+}
+.view-toggle { display: flex; gap: 4px; }
+.view-btn {
+  padding: 5px 9px;
+  border: 1px solid var(--color-sage);
+  border-radius: 7px;
+  background: none;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--color-muted);
+  transition: background 0.12s;
+  line-height: 1;
+}
+.view-btn.active { background: var(--color-surface); color: var(--color-text); }
+
+/* ── Recipe grid ── */
+.recipe-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+.recipe-card {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #d6d0b2;
+  background: #fff;
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+}
+.recipe-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(80,70,30,0.09); }
+
+.recipe-thumb {
+  height: 100px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+  position: relative;
+}
+.recipe-card:nth-child(1) .recipe-thumb { background: #fff0cc; }
+.recipe-card:nth-child(2) .recipe-thumb { background: #e8f0e0; }
+.recipe-card:nth-child(3) .recipe-thumb { background: #fde8d8; }
+.recipe-card:nth-child(4) .recipe-thumb { background: #e8eef8; }
+.recipe-card:nth-child(5) .recipe-thumb { background: #f5e8f0; }
+.recipe-card:nth-child(6) .recipe-thumb { background: #fff0cc; }
+.recipe-card:nth-child(7) .recipe-thumb { background: #e8f0e0; }
+.recipe-card:nth-child(8) .recipe-thumb { background: #fde8d8; }
+
+/* save/unsave button on card */
+.btn-unsave {
+  position: absolute;
+  top: 8px; right: 8px;
+  background: rgba(255,255,255,0.85);
+  border: 1px solid #d0c8a8;
+  border-radius: 6px;
+  padding: 3px 7px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  cursor: pointer;
+  font-family: var(--font-ui);
+  transition: background 0.12s;
+  backdrop-filter: blur(2px);
+}
+.btn-unsave:hover { background: #fff; color: #b36b3a; }
+
+.recipe-body { padding: 10px 12px 12px; }
+.recipe-name { font-family: var(--font-head); font-size: 0.88rem; font-weight: 600; color: var(--color-text); margin-bottom: 2px; }
+.recipe-by { font-size: 0.72rem; color: var(--color-muted); margin-bottom: 8px; }
+.recipe-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 0.7rem; color: var(--color-muted); }
+
+.tag {
+  display: inline-block; padding: 1px 8px; border-radius: 999px;
+  background: var(--color-surface-alt); border: 1px solid var(--color-sage);
+  font-size: 0.68rem; font-weight: 500; color: var(--color-muted);
+}
+
+/* personal note on a saved recipe */
+.recipe-note {
+  margin-top: 8px;
+  padding: 6px 8px;
+  background: var(--color-surface);
+  border-radius: 6px;
+  font-size: 0.72rem;
+  color: var(--color-muted);
+  font-style: italic;
+  line-height: 1.4;
+  border-left: 2px solid #d8c888;
+}
+.recipe-note::before { content: "📝 "; font-style: normal; }
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--color-muted);
+  display: none;
+}
+.empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.empty-state p { font-family: var(--font-head); font-size: 1rem; font-style: italic; margin-bottom: 8px; color: var(--color-text); }
+.empty-state small { font-size: 0.82rem; }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: var(--color-sage); border-radius: 999px; }
+
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <h1>Plateful</h1>
+      <p>your recipe space</p>
+    </div>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">Explore</a>
+      <a href="#">My Recipes</a>
+      <a href="#" class="active">Saved</a>
+      <a href="#">Following</a>
+      <a href="#">Meal Planner</a>
+      <hr class="nav-divider" />
+      <a href="#">Profile</a>
+      <a href="#">Settings</a>
+    </nav>
+    <div class="sidebar-user">
+      <div class="avatar">JL</div>
+      <div>
+        <p class="name">Jamie Lee</p>
+        <p class="handle">@jamiecooks</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="hi">Hey, Jamie</span>
+        <span class="date">Mon 30 March</span>
+      </div>
+      <div class="topbar-right">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search saved recipes…" />
+        </div>
+        <button class="notif-btn">
+          🔔
+          <span class="notif-badge">3</span>
+        </button>
+        <a href="#" class="btn-upload">+ New recipe</a>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- intro -->
+      <div class="page-intro">
+        <h2>Saved recipes</h2>
+        <p>61 recipes across 4 collections — everything you wanted to come back to.</p>
+      </div>
+
+      <!-- COLLECTIONS — pill tabs -->
+      <div class="collections-row">
+        <a href="#" class="collection-chip active">
+          <span class="chip-emoji">🗂</span>
+          All saved
+          <span class="chip-count">61</span>
+        </a>
+        <a href="#" class="collection-chip">
+          <span class="chip-emoji">🍜</span>
+          Weeknight dinners
+          <span class="chip-count">18</span>
+        </a>
+        <a href="#" class="collection-chip">
+          <span class="chip-emoji">🥐</span>
+          Weekend baking
+          <span class="chip-count">14</span>
+        </a>
+        <a href="#" class="collection-chip">
+          <span class="chip-emoji">🥗</span>
+          Light &amp; fresh
+          <span class="chip-count">12</span>
+        </a>
+        <a href="#" class="collection-chip">
+          <span class="chip-emoji">🍰</span>
+          Desserts
+          <span class="chip-count">17</span>
+        </a>
+        <a href="#" class="chip-new">+ New collection</a>
+      </div>
+
+      <!-- TOOLBAR -->
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <span>Sort by</span>
+          <select class="sort-select">
+            <option>Recently saved</option>
+            <option>Most popular</option>
+            <option>Cook time</option>
+            <option>Rating</option>
+          </select>
+        </div>
+        <div class="view-toggle">
+          <button class="view-btn active">⊞ Grid</button>
+          <button class="view-btn">☰ List</button>
+        </div>
+      </div>
+
+      <!-- RECIPE GRID -->
+      <div class="recipe-grid">
+
+        <div class="recipe-card">
+          <div class="recipe-thumb">
+            🍜
+            <button class="btn-unsave">✕ Unsave</button>
+          </div>
+          <div class="recipe-body">
+            <p class="recipe-name">Spicy Miso Ramen</p>
+            <p class="recipe-by">by @noodlelover</p>
+            <div class="recipe-meta">
+              <span class="tag">Japanese</span>
+              <span>⭐ 4.8</span>
+              <span>25 min</span>
+            </div>
+            <p class="recipe-note">Try with extra soft-boiled eggs</p>
+          </div>
+        </div>
+
+        <div class="recipe-card">
+          <div class="recipe-thumb">
+            🥗
+            <button class="btn-unsave">✕ Unsave</button>
+          </div>
+          <div class="recipe-body">
+            <p class="recipe-name">Warm Halloumi Salad</p>
+            <p class="recipe-by">by @grillqueen</p>
+            <div class="recipe-meta">
+              <span class="tag">Vegetarian</span>
+              <span>⭐ 4.6</span>
+              <span>15 min</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="recipe-card">
+          <div class="recipe-thumb">
+            🍰
+            <button class="btn-unsave">✕ Unsave</button>
+          </div>
+          <div class="recipe-body">
+            <p class="recipe-name">Brown Butter Tart</p>
+            <p class="recipe-by">by @sweetspot</p>
+            <div class="recipe-meta">
+              <span class="tag">Dessert</span>
+              <span>⭐ 4.9</span>
+              <span>1 hr</span>
+            </div>
+            <p class="recipe-note">Made this twice already, reduce sugar a bit</p>
+          </div>
+        </div>
+
+        <div class="recipe-card">
+          <div class="recipe-thumb">
+            🍲
+            <button class="btn-unsave">✕ Unsave</button>
+          </div>
+          <div class="recipe-body">
+            <p class="recipe-name">Slow Cooker Lentil Soup</p>
+            <p class="recipe-by">by @homechef_dan</p>
+            <div class="recipe-meta">
+              <span class="tag">Vegan</span>
+              <span>⭐ 4.5</span>
+              <span>4 hrs</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="recipe-card">
+          <div class="recipe-thumb">
+            🥩
+            <button class="btn-unsave">✕ Unsave</button>
+          </div>
+          <div class="recipe-body">
+            <p class="recipe-name">Garlic Butter Steak</p>
+            <p class="recipe-by">by @chefmarcus</p>
+            <div class="recipe-meta">
+              <span class="tag">Dinner</span>
+              <span>⭐ 4.7</span>
+              <span>20 min</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="recipe-card">
+          <div class="recipe-thumb">
+            🍞
+            <button class="btn-unsave">✕ Unsave</button>
+          </div>
+          <div class="recipe-body">
+            <p class="recipe-name">Sourdough Focaccia</p>
+            <p class="recipe-by">by @bakersoph</p>
+            <div class="recipe-meta">
+              <span class="tag">Baking</span>
+              <span>⭐ 4.8</span>
+              <span>2 hrs</span>
+            </div>
+            <p class="recipe-note">Use rosemary + sea salt on top</p>
+          </div>
+        </div>
+
+        <div class="recipe-card">
+          <div class="recipe-thumb">
+            🍮
+            <button class="btn-unsave">✕ Unsave</button>
+          </div>
+          <div class="recipe-body">
+            <p class="recipe-name">Crème Caramel</p>
+            <p class="recipe-by">by @sweetspot</p>
+            <div class="recipe-meta">
+              <span class="tag">Dessert</span>
+              <span>⭐ 4.6</span>
+              <span>1.5 hrs</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="recipe-card">
+          <div class="recipe-thumb">
+            🥘
+            <button class="btn-unsave">✕ Unsave</button>
+          </div>
+          <div class="recipe-body">
+            <p class="recipe-name">One-Pan Chicken &amp; Rice</p>
+            <p class="recipe-by">by @foodie_ara</p>
+            <div class="recipe-meta">
+              <span class="tag">Easy</span>
+              <span>⭐ 4.4</span>
+              <span>40 min</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- end recipe grid -->
+
+    </div>
+  </main>
+</div>
+</body>
+</html>
