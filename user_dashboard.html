@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plateful — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+
+:root {
+  --color-bg:          #FFFDF0;
+  --color-surface:     #FFF2C2;
+  --color-surface-alt: #EFF3EA;
+  --color-sage:        #D9DFC6;
+  --color-text:        #3a3224;
+  --color-muted:       #7a6e5f;
+  --color-faint:       #aaa090;
+  --color-accent:      #6e7d52;
+  --font-head: 'Fraunces', Georgia, serif;
+  --font-ui:   'Figtree', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+a { color: var(--color-accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+ul { list-style: none; }
+
+/* ── Layout ── */
+.wrapper { display: flex; height: 100vh; overflow: hidden; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 210px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 14px 24px;
+  background: var(--color-sage);
+  border-right: 1px solid #c8d0b4;
+  overflow-y: auto;
+}
+
+.logo {
+  padding: 0 10px;
+  margin-bottom: 28px;
+}
+.logo h1 {
+  font-family: var(--font-head);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.3px;
+}
+.logo p {
+  font-size: 0.72rem;
+  color: var(--color-muted);
+  margin-top: 2px;
+}
+
+.sidebar nav { display: flex; flex-direction: column; gap: 1px; }
+
+.sidebar nav a {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+  transition: background 0.12s;
+}
+.sidebar nav a:hover { background: #c8d0b4; text-decoration: none; }
+.sidebar nav a.active {
+  background: #bac4a5;
+  font-weight: 600;
+}
+
+.sidebar .nav-divider {
+  border: none;
+  border-top: 1px solid #bdc7a8;
+  margin: 10px 0;
+}
+
+.sidebar-user {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid #bdc7a8;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-left: 2px;
+}
+.avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sidebar-user .name { font-size: 0.83rem; font-weight: 600; color: var(--color-text); }
+.sidebar-user .handle { font-size: 0.7rem; color: var(--color-muted); margin-top: 1px; }
+
+/* ── Main ── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ── Topbar ── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  height: 60px;
+  border-bottom: 1px solid var(--color-sage);
+  background: var(--color-bg);
+  flex-shrink: 0;
+}
+
+/* greeting is small + inline in topbar — not a big hero */
+.topbar-left {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.topbar-left span.hi {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.topbar-left span.date {
+  font-size: 0.78rem;
+  color: var(--color-faint);
+}
+
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.search-wrap { position: relative; }
+.search-wrap input {
+  padding: 6px 12px 6px 30px;
+  border: 1px solid var(--color-sage);
+  border-radius: 20px;
+  background: var(--color-surface-alt);
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--color-text);
+  width: 190px;
+  outline: none;
+  transition: border-color 0.15s, width 0.2s;
+}
+.search-wrap input::placeholder { color: var(--color-faint); }
+.search-wrap input:focus { border-color: var(--color-accent); width: 220px; }
+.search-icon {
+  position: absolute;
+  left: 10px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-faint);
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+.notif-btn {
+  position: relative;
+  background: none;
+  border: 1px solid var(--color-sage);
+  border-radius: 8px;
+  padding: 5px 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  color: var(--color-muted);
+  transition: background 0.12s;
+}
+.notif-btn:hover { background: var(--color-surface-alt); }
+.notif-badge {
+  position: absolute; top: -5px; right: -5px;
+  background: #b36b3a; color: #fff;
+  font-size: 0.58rem; font-weight: 700;
+  width: 15px; height: 15px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--color-bg);
+}
+
+.btn-upload {
+  padding: 6px 14px;
+  background: var(--color-text);
+  color: var(--color-surface) !important;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: opacity 0.15s;
+  text-decoration: none !important;
+}
+.btn-upload:hover { opacity: 0.85; }
+
+/* ── Scrollable content ── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 28px 40px;
+}
+
+/* ── Page title — replaces the big greeting hero ── */
+.page-intro {
+  margin-bottom: 26px;
+}
+.page-intro h2 {
+  font-family: var(--font-head);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+.page-intro p {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+/* ── Stat strip — inline, not big cards ── */
+.stat-strip {
+  display: flex;
+  gap: 0;
+  background: var(--color-surface);
+  border: 1px solid #d8d0b0;
+  border-radius: 12px;
+  margin-bottom: 28px;
+  overflow: hidden;
+}
+.stat-item {
+  flex: 1;
+  padding: 14px 20px;
+  border-right: 1px solid #d8d0b0;
+}
+.stat-item:last-child { border-right: none; }
+.stat-item .label {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 3px;
+}
+.stat-item .value {
+  font-family: var(--font-head);
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1;
+}
+.stat-item .hint {
+  font-size: 0.72rem;
+  color: var(--color-faint);
+  margin-top: 3px;
+}
+
+/* ── Two column ── */
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 28px;
+}
+.col-left, .col-right { display: flex; flex-direction: column; gap: 28px; }
+
+/* ── Section titles (bare, no box) ── */
+.section-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.section-title h3 {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.section-title a {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  font-weight: 500;
+}
+.section-title a:hover { color: var(--color-text); }
+
+/* ── Recipe cards ── */
+.recipe-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+.recipe-card {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #d6d0b2;
+  background: #fff;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.recipe-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(80,70,30,0.09);
+}
+
+.recipe-thumb {
+  height: 80px;
+  background: var(--color-surface-alt);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem;
+}
+/* give each thumb a slightly different tint */
+.recipe-card:nth-child(1) .recipe-thumb { background: #fff0cc; }
+.recipe-card:nth-child(2) .recipe-thumb { background: #e8f0e0; }
+.recipe-card:nth-child(3) .recipe-thumb { background: #fde8d8; }
+
+.recipe-body { padding: 10px 12px 12px; }
+.recipe-name {
+  font-family: var(--font-head);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 2px;
+}
+.recipe-by {
+  font-size: 0.72rem;
+  color: var(--color-muted);
+  margin-bottom: 8px;
+}
+.recipe-meta {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.7rem; color: var(--color-muted); flex-wrap: wrap;
+}
+.tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-sage);
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+/* ── Popularity — no panel box, just lines ── */
+.pop-list { display: flex; flex-direction: column; gap: 13px; }
+.pop-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.pop-emoji { font-size: 1.1rem; width: 24px; text-align: center; flex-shrink: 0; }
+.pop-info { flex: 1; }
+.pop-top {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 4px;
+}
+.pop-top span { font-size: 0.83rem; font-weight: 500; color: var(--color-text); }
+.pop-top small { font-size: 0.72rem; color: var(--color-faint); }
+.bar { height: 5px; background: var(--color-sage); border-radius: 999px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--color-accent); border-radius: 999px; }
+
+/* ── Activity — looser, no box ── */
+.feed { display: flex; flex-direction: column; }
+.feed-item {
+  padding: 10px 0;
+  border-bottom: 1px solid #e8e0cc;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.feed-item:last-child { border-bottom: none; }
+.feed-text { font-size: 0.82rem; color: var(--color-text); line-height: 1.4; }
+.feed-text strong { font-weight: 600; }
+.feed-time { font-size: 0.7rem; color: var(--color-faint); }
+
+/* ── Following ── */
+.follow-list { display: flex; flex-direction: column; gap: 11px; }
+.follow-item { display: flex; align-items: center; gap: 9px; }
+.follow-item .info { flex: 1; }
+.follow-item .info .uname {
+  font-size: 0.83rem; font-weight: 600; color: var(--color-text);
+}
+.follow-item .info .sub {
+  font-size: 0.71rem; color: var(--color-muted);
+}
+.new-pill {
+  font-size: 0.66rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #d6e4bc;
+  color: var(--color-accent);
+  border: 1px solid #b8ce98;
+}
+
+/* ── Weather card — slightly warmer, less boxy ── */
+.weather-card {
+  background: var(--color-surface);
+  border: 1px solid #d8d0b0;
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+.weather-card .w-top {
+  font-size: 0.72rem;
+  color: var(--color-muted);
+  margin-bottom: 6px;
+}
+.weather-card .w-msg {
+  font-family: var(--font-head);
+  font-size: 0.93rem;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+.weather-card a {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: var(--color-sage); border-radius: 999px; }
+
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <h1>Plateful</h1>
+      <p>your recipe space</p>
+    </div>
+
+    <nav>
+      <a href="#" class="active">Home</a>
+      <a href="#">Explore</a>
+      <a href="#">My Recipes</a>
+      <a href="#">Saved</a>
+      <a href="#">Following</a>
+      <a href="#">Meal Planner</a>
+      <hr class="nav-divider" />
+      <a href="#">Profile</a>
+      <a href="#">Settings</a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="avatar">JL</div>
+      <div>
+        <p class="name">Jamie Lee</p>
+        <p class="handle">@jamiecooks</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="hi">Hey, Jamie</span>
+        <span class="date">Mon 30 March</span>
+      </div>
+      <div class="topbar-right">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search recipes…" />
+        </div>
+        <button class="notif-btn">
+          🔔
+          <span class="notif-badge">3</span>
+        </button>
+        <a href="#" class="btn-upload">+ New recipe</a>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- page intro — just a line, not a hero -->
+      <div class="page-intro">
+        <h2>What's cooking today?</h2>
+        <p>Here's a quick look at what's been happening on your profile.</p>
+      </div>
+
+      <!-- STAT STRIP — one connected bar, not 4 separate cards -->
+      <div class="stat-strip">
+        <div class="stat-item">
+          <div class="label">Recipes posted</div>
+          <div class="value">14</div>
+          <div class="hint">+2 this month</div>
+        </div>
+        <div class="stat-item">
+          <div class="label">Total saves</div>
+          <div class="value">382</div>
+          <div class="hint">across all recipes</div>
+        </div>
+        <div class="stat-item">
+          <div class="label">Following</div>
+          <div class="value">27</div>
+          <div class="hint">3 posted recently</div>
+        </div>
+        <div class="stat-item">
+          <div class="label">Saved by you</div>
+          <div class="value">61</div>
+          <div class="hint">in 4 collections</div>
+        </div>
+      </div>
+
+      <!-- TWO COLUMNS -->
+      <div class="columns">
+
+        <!-- LEFT -->
+        <div class="col-left">
+
+          <!-- Recently saved — no panel box -->
+          <section>
+            <div class="section-title">
+              <h3>Recently saved</h3>
+              <a href="#">See all</a>
+            </div>
+            <div class="recipe-grid">
+
+              <div class="recipe-card">
+                <div class="recipe-thumb">🍜</div>
+                <div class="recipe-body">
+                  <p class="recipe-name">Spicy Miso Ramen</p>
+                  <p class="recipe-by">by @noodlelover</p>
+                  <div class="recipe-meta">
+                    <span class="tag">Japanese</span>
+                    <span>⭐ 4.8</span>
+                    <span>25 min</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="recipe-card">
+                <div class="recipe-thumb">🥗</div>
+                <div class="recipe-body">
+                  <p class="recipe-name">Warm Halloumi Salad</p>
+                  <p class="recipe-by">by @grillqueen</p>
+                  <div class="recipe-meta">
+                    <span class="tag">Vegetarian</span>
+                    <span>⭐ 4.6</span>
+                    <span>15 min</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="recipe-card">
+                <div class="recipe-thumb">🍰</div>
+                <div class="recipe-body">
+                  <p class="recipe-name">Brown Butter Tart</p>
+                  <p class="recipe-by">by @sweetspot</p>
+                  <div class="recipe-meta">
+                    <span class="tag">Dessert</span>
+                    <span>⭐ 4.9</span>
+                    <span>1 hr</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- Popularity — bare list, no panel -->
+          <section>
+            <div class="section-title">
+              <h3>Your top recipes</h3>
+              <a href="#">Manage</a>
+            </div>
+            <ul class="pop-list">
+              <li class="pop-row">
+                <span class="pop-emoji">🥘</span>
+                <div class="pop-info">
+                  <div class="pop-top"><span>Lamb Tagine</span><small>142 saves</small></div>
+                  <div class="bar"><div class="bar-fill" style="width:88%"></div></div>
+                </div>
+              </li>
+              <li class="pop-row">
+                <span class="pop-emoji">🍳</span>
+                <div class="pop-info">
+                  <div class="pop-top"><span>Shakshuka</span><small>98 saves</small></div>
+                  <div class="bar"><div class="bar-fill" style="width:64%"></div></div>
+                </div>
+              </li>
+              <li class="pop-row">
+                <span class="pop-emoji">🍞</span>
+                <div class="pop-info">
+                  <div class="pop-top"><span>Sourdough Focaccia</span><small>76 saves</small></div>
+                  <div class="bar"><div class="bar-fill" style="width:48%"></div></div>
+                </div>
+              </li>
+              <li class="pop-row">
+                <span class="pop-emoji">🍮</span>
+                <div class="pop-info">
+                  <div class="pop-top"><span>Crème Caramel</span><small>66 saves</small></div>
+                  <div class="bar"><div class="bar-fill" style="width:40%"></div></div>
+                </div>
+              </li>
+            </ul>
+          </section>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="col-right">
+
+          <!-- Activity — feed style, no panel box -->
+          <section>
+            <div class="section-title">
+              <h3>Activity</h3>
+            </div>
+            <div class="feed">
+              <div class="feed-item">
+                <span class="feed-text"><strong>@foodie_ara</strong> saved your Lamb Tagine</span>
+                <span class="feed-time">2 hours ago</span>
+              </div>
+              <div class="feed-item">
+                <span class="feed-text"><strong>@chefmarcus</strong> left a comment on Shakshuka</span>
+                <span class="feed-time">5 hours ago</span>
+              </div>
+              <div class="feed-item">
+                <span class="feed-text"><strong>@bakersoph</strong> started following you</span>
+                <span class="feed-time">Yesterday</span>
+              </div>
+              <div class="feed-item">
+                <span class="feed-text"><strong>@noodlelover</strong> gave Lamb Tagine ⭐ 5</span>
+                <span class="feed-time">2 days ago</span>
+              </div>
+              <div class="feed-item">
+                <span class="feed-text">You posted <strong>Sourdough Focaccia</strong></span>
+                <span class="feed-time">3 days ago</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Following -->
+          <section>
+            <div class="section-title">
+              <h3>People you follow</h3>
+              <a href="#">See all</a>
+            </div>
+            <ul class="follow-list">
+              <li class="follow-item">
+                <div class="avatar">NL</div>
+                <div class="info">
+                  <p class="uname">@noodlelover</p>
+                  <p class="sub">Posted 1 hr ago</p>
+                </div>
+                <span class="new-pill">new</span>
+              </li>
+              <li class="follow-item">
+                <div class="avatar">GQ</div>
+                <div class="info">
+                  <p class="uname">@grillqueen</p>
+                  <p class="sub">3 recipes this week</p>
+                </div>
+              </li>
+              <li class="follow-item">
+                <div class="avatar">CM</div>
+                <div class="info">
+                  <p class="uname">@chefmarcus</p>
+                  <p class="sub">Posted 2 days ago</p>
+                </div>
+              </li>
+            </ul>
+          </section>
+
+          <!-- Weather -->
+          <div class="weather-card">
+            <p class="w-top">Perth today ☁️ 19°C</p>
+            <p class="w-msg">"Sounds like a soup kind of night."</p>
+            <a href="#">Browse soup recipes →</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
