@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plateful — Welcome</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+
+:root {
+  --color-bg:          #FFFDF0;
+  --color-surface:     #FFF2C2;
+  --color-surface-alt: #EFF3EA;
+  --color-sage:        #D9DFC6;
+  --color-text:        #3a3224;
+  --color-muted:       #7a6e5f;
+  --color-faint:       #aaa090;
+  --color-accent:      #6e7d52;
+  --color-accent-dark: #556240;
+  --color-error:       #b36b3a;
+  --font-head: 'Fraunces', Georgia, serif;
+  --font-ui:   'Figtree', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── Split layout ── */
+.split {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* ── Left panel — decorative ── */
+.panel-left {
+  width: 42%;
+  flex-shrink: 0;
+  background: var(--color-sage);
+  border-right: 1px solid #c8d0b4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.panel-left::before {
+  content: '';
+  position: absolute;
+  width: 380px; height: 380px;
+  border-radius: 50%;
+  background: #c8d0b4;
+  top: -100px; right: -120px;
+  opacity: 0.5;
+}
+.panel-left::after {
+  content: '';
+  position: absolute;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: #bac4a5;
+  bottom: 60px; left: -80px;
+  opacity: 0.4;
+}
+
+.panel-logo {
+  position: relative; z-index: 1;
+}
+.panel-logo h1 {
+  font-family: var(--font-head);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.5px;
+}
+.panel-logo p {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  margin-top: 3px;
+}
+
+.panel-hero {
+  position: relative; z-index: 1;
+}
+.panel-hero .tagline {
+  font-family: var(--font-head);
+  font-size: 2rem;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--color-text);
+  line-height: 1.3;
+  margin-bottom: 16px;
+}
+.panel-hero .tagline em {
+  font-style: normal;
+  color: var(--color-accent);
+}
+.panel-hero p {
+  font-size: 0.88rem;
+  color: var(--color-muted);
+  line-height: 1.6;
+  max-width: 280px;
+}
+
+.panel-recipes {
+  position: relative; z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mini-card {
+  background: rgba(255,255,255,0.55);
+  border: 1px solid #c8d0b4;
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  backdrop-filter: blur(2px);
+}
+.mini-card .icon { font-size: 1.4rem; }
+.mini-card .mc-name {
+  font-family: var(--font-head);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.mini-card .mc-by {
+  font-size: 0.7rem;
+  color: var(--color-muted);
+  margin-top: 1px;
+}
+.mini-card .mc-stat {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--color-muted);
+  flex-shrink: 0;
+}
+
+/* ── Right panel — form ── */
+.panel-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px;
+}
+
+.form-box {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  background: var(--color-surface);
+  border: 1px solid #d8d0b0;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 32px;
+}
+.tab-btn {
+  flex: 1;
+  padding: 9px;
+  border: none;
+  background: none;
+  border-radius: 7px;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.tab-btn.active {
+  background: #fff;
+  color: var(--color-text);
+  box-shadow: 0 1px 4px rgba(80,70,30,0.10);
+}
+
+/* ── Form ── */
+.form-heading {
+  margin-bottom: 24px;
+}
+.form-heading h2 {
+  font-family: var(--font-head);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+.form-heading p {
+  font-size: 0.83rem;
+  color: var(--color-muted);
+}
+
+.form-panel { display: none; }
+.form-panel.active { display: block; }
+
+.field {
+  margin-bottom: 16px;
+}
+.field label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 5px;
+  letter-spacing: 0.01em;
+}
+.field input {
+  width: 100%;
+  padding: 9px 13px;
+  border: 1px solid #d0c8b0;
+  border-radius: 8px;
+  background: #fff;
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.field input::placeholder { color: var(--color-faint); }
+.field input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(110,125,82,0.12);
+}
+.field-hint {
+  font-size: 0.72rem;
+  color: var(--color-faint);
+  margin-top: 4px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 11px;
+  margin-top: 6px;
+  background: var(--color-text);
+  color: var(--color-surface);
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn-submit:hover { opacity: 0.87; }
+.btn-submit:active { transform: scale(0.99); }
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0;
+  color: var(--color-faint);
+  font-size: 0.75rem;
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid #d8d0b0;
+}
+
+.btn-social {
+  width: 100%;
+  padding: 10px;
+  background: var(--color-surface-alt);
+  border: 1px solid #c8d0b4;
+  border-radius: 8px;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.btn-social:hover { background: #dde4d3; }
+
+.form-footer {
+  margin-top: 22px;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+.form-footer a {
+  color: var(--color-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+.form-footer a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+.password-wrap { position: relative; }
+.password-wrap input { padding-right: 40px; }
+.show-pass {
+  position: absolute;
+  right: 12px; top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--color-faint);
+  font-family: var(--font-ui);
+  font-weight: 500;
+  padding: 0;
+}
+.show-pass:hover { color: var(--color-muted); }
+
+.checkbox-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-bottom: 16px;
+}
+.checkbox-field input[type="checkbox"] {
+  width: 15px; height: 15px;
+  margin-top: 2px;
+  accent-color: var(--color-accent);
+  flex-shrink: 0;
+}
+.checkbox-field label {
+  font-size: 0.78rem;
+  color: var(--color-muted);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.checkbox-field a {
+  color: var(--color-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: var(--color-sage); border-radius: 999px; }
+
+/* responsive */
+@media (max-width: 700px) {
+  .panel-left { display: none; }
+}
+
+  </style>
+</head>
+<body>
+
+<div class="split">
+
+  <!-- LEFT PANEL -->
+  <div class="panel-left">
+    <div class="panel-logo">
+      <h1>Plateful</h1>
+      <p>your recipe space</p>
+    </div>
+
+    <div class="panel-hero">
+      <p class="tagline">Cook, share, <em>inspire.</em></p>
+      <p>Join a community of home cooks sharing the recipes that matter most to them — one plate at a time.</p>
+    </div>
+
+    <div class="panel-recipes">
+      <div class="mini-card">
+        <span class="icon">🥘</span>
+        <div>
+          <p class="mc-name">Lamb Tagine</p>
+          <p class="mc-by">by @jamiecooks</p>
+        </div>
+        <span class="mc-stat">142 saves</span>
+      </div>
+      <div class="mini-card">
+        <span class="icon">🍜</span>
+        <div>
+          <p class="mc-name">Spicy Miso Ramen</p>
+          <p class="mc-by">by @noodlelover</p>
+        </div>
+        <span class="mc-stat">⭐ 4.8</span>
+      </div>
+      <div class="mini-card">
+        <span class="icon">🍞</span>
+        <div>
+          <p class="mc-name">Sourdough Focaccia</p>
+          <p class="mc-by">by @jamiecooks</p>
+        </div>
+        <span class="mc-stat">76 saves</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="panel-right">
+    <div class="form-box">
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('login', this)">Sign in</button>
+        <button class="tab-btn" onclick="switchTab('signup', this)">Create account</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div class="form-panel active" id="panel-login">
+        <div class="form-heading">
+          <h2>Welcome back</h2>
+          <p>Sign in to your Plateful account</p>
+        </div>
+
+        <div class="field">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" placeholder="you@email.com" />
+        </div>
+
+        <div class="field">
+          <label for="login-pass">Password</label>
+          <div class="password-wrap">
+            <input type="password" id="login-pass" placeholder="••••••••" />
+            <button class="show-pass" type="button" onclick="togglePass('login-pass', this)">show</button>
+          </div>
+        </div>
+
+        <div style="text-align:right; margin-top:-8px; margin-bottom:18px;">
+          <a href="#" style="font-size:0.78rem; color:var(--color-muted); font-weight:500;">Forgot password?</a>
+        </div>
+
+        <button class="btn-submit">Sign in</button>
+
+        <div class="divider">or</div>
+
+        <button class="btn-social">Continue with Google</button>
+
+        <div class="form-footer">
+          No account? <a href="#" onclick="switchTabByName('signup')">Create one free →</a>
+        </div>
+      </div>
+
+      <!-- SIGN UP -->
+      <div class="form-panel" id="panel-signup">
+        <div class="form-heading">
+          <h2>Join Plateful</h2>
+          <p>Create your free account and start sharing</p>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="su-first">First name</label>
+            <input type="text" id="su-first" placeholder="Jamie" />
+          </div>
+          <div class="field">
+            <label for="su-last">Last name</label>
+            <input type="text" id="su-last" placeholder="Lee" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="su-username">Username</label>
+          <input type="text" id="su-username" placeholder="@jamiecooks" />
+          <p class="field-hint">This is how others will find you on Plateful</p>
+        </div>
+
+        <div class="field">
+          <label for="su-email">Email</label>
+          <input type="email" id="su-email" placeholder="you@email.com" />
+        </div>
+
+        <div class="field">
+          <label for="su-pass">Password</label>
+          <div class="password-wrap">
+            <input type="password" id="su-pass" placeholder="At least 8 characters" />
+            <button class="show-pass" type="button" onclick="togglePass('su-pass', this)">show</button>
+          </div>
+        </div>
+
+        <div class="checkbox-field">
+          <input type="checkbox" id="su-terms" />
+          <label for="su-terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+        </div>
+
+        <button class="btn-submit">Create account</button>
+
+        <div class="divider">or</div>
+
+        <button class="btn-social">Sign up with Google</button>
+
+        <div class="form-footer">
+          Already have an account? <a href="#" onclick="switchTabByName('login')">Sign in →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+}
+function switchTabByName(name) {
+  const idx = name === 'login' ? 0 : 1;
+  switchTab(name, document.querySelectorAll('.tab-btn')[idx]);
+}
+function togglePass(id, btn) {
+  const input = document.getElementById(id);
+  if (input.type === 'password') { input.type = 'text'; btn.textContent = 'hide'; }
+  else { input.type = 'password'; btn.textContent = 'show'; }
+}
+</script>
+
+</body>
+</html>
