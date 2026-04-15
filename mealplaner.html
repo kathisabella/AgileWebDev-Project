@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plateful — Meal Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --color-bg:          #FFFDF0;
+      --color-surface:     #FFF2C2;
+      --color-surface-alt: #EFF3EA;
+      --color-sage:        #D9DFC6;
+      --color-text:        #3a3224;
+      --color-muted:       #7a6e5f;
+      --color-faint:       #aaa090;
+      --color-accent:      #6e7d52;
+      --color-peach:       #fde8d8;
+      --color-lilac:       #ece6f7;
+      --font-head: 'Fraunces', Georgia, serif;
+      --font-ui: 'Figtree', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    body {
+      font-family: var(--font-ui);
+      background: var(--color-bg);
+      color: var(--color-text);
+    }
+
+    a { text-decoration: none; color: inherit; }
+    button, input, select { font: inherit; }
+
+    .wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 210px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 28px 14px 24px;
+      background: var(--color-sage);
+      border-right: 1px solid #c8d0b4;
+    }
+
+    .logo {
+      padding: 0 10px;
+      margin-bottom: 28px;
+    }
+
+    .logo h1 {
+      font-family: var(--font-head);
+      font-size: 1.45rem;
+      font-weight: 700;
+    }
+
+    .logo p {
+      font-size: 0.72rem;
+      color: var(--color-muted);
+      margin-top: 2px;
+    }
+
+    .sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .sidebar nav a {
+      display: block;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--color-text);
+    }
+
+    .sidebar nav a:hover {
+      background: #c8d0b4;
+    }
+
+    .sidebar nav a.active {
+      background: #bac4a5;
+      font-weight: 600;
+    }
+
+    .nav-divider {
+      border: none;
+      border-top: 1px solid #bdc7a8;
+      margin: 10px 0;
+    }
+
+    .sidebar-user {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid #bdc7a8;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding-left: 2px;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .sidebar-user .name {
+      font-size: 0.83rem;
+      font-weight: 600;
+    }
+
+    .sidebar-user .handle {
+      font-size: 0.7rem;
+      color: var(--color-muted);
+      margin-top: 1px;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      height: 60px;
+      border-bottom: 1px solid var(--color-sage);
+      background: var(--color-bg);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .topbar-left .hi {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .topbar-left .date {
+      font-size: 0.78rem;
+      color: var(--color-faint);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-wrap input {
+      width: 220px;
+      padding: 7px 12px 7px 30px;
+      border: 1px solid var(--color-sage);
+      border-radius: 20px;
+      background: var(--color-surface-alt);
+      font-size: 0.8rem;
+      color: var(--color-text);
+      outline: none;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.75rem;
+      color: var(--color-faint);
+    }
+
+    .btn-upload {
+      padding: 6px 14px;
+      background: var(--color-text);
+      color: var(--color-surface);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px;
+    }
+
+    .page-intro {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+
+    .page-intro h2 {
+      font-family: var(--font-head);
+      font-size: 1.55rem;
+      margin-bottom: 4px;
+    }
+
+    .page-intro p {
+      color: var(--color-muted);
+      font-size: 0.88rem;
+    }
+
+    .planner-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-soft,
+    .btn-solid {
+      border: 1px solid #d8d0b0;
+      border-radius: 10px;
+      padding: 9px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-soft {
+      background: #fff;
+      color: var(--color-text);
+    }
+
+    .btn-solid {
+      background: var(--color-surface);
+      color: var(--color-text);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 26px;
+    }
+
+    .summary-card {
+      background: var(--color-surface);
+      border: 1px solid #d8d0b0;
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+
+    .summary-card .label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-muted);
+      margin-bottom: 6px;
+    }
+
+    .summary-card .value {
+      font-family: var(--font-head);
+      font-size: 1.5rem;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+
+    .summary-card .hint {
+      font-size: 0.75rem;
+      color: var(--color-faint);
+    }
+
+    .planner-layout {
+      display: grid;
+      grid-template-columns: 1.45fr 0.75fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: #fff;
+      border: 1px solid #ddd4b8;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 18px;
+      background: #fff8da;
+      border-bottom: 1px solid #e8ddbc;
+    }
+
+    .panel-header h3 {
+      font-family: var(--font-head);
+      font-size: 1rem;
+    }
+
+    .panel-header p {
+      font-size: 0.74rem;
+      color: var(--color-muted);
+      margin-top: 2px;
+    }
+
+    .week-table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th, td {
+      border-right: 1px solid #eee5cb;
+      border-bottom: 1px solid #eee5cb;
+      vertical-align: top;
+    }
+
+    th:last-child, td:last-child {
+      border-right: none;
+    }
+
+    thead th {
+      background: var(--color-surface-alt);
+      padding: 14px 10px;
+      text-align: left;
+      font-size: 0.82rem;
+      color: var(--color-text);
+      font-weight: 700;
+    }
+
+    thead th:first-child {
+      width: 98px;
+      background: #f6f3e5;
+    }
+
+    .meal-label {
+      background: #faf6e6;
+      padding: 14px 10px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--color-text);
+      width: 98px;
+    }
+
+    .meal-cell {
+      padding: 12px;
+      min-height: 136px;
+      background: #fff;
+    }
+
+    .meal-card {
+      border: 1px solid #e3dbc1;
+      border-radius: 12px;
+      padding: 10px;
+      background: #fffdf6;
+      min-height: 110px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .meal-card.breakfast { background: #fff8dc; }
+    .meal-card.lunch { background: #eef5e7; }
+    .meal-card.dinner { background: #fdf0e8; }
+
+    .meal-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .meal-emoji {
+      font-size: 1.3rem;
+    }
+
+    .meal-tag {
+      font-size: 0.66rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.8);
+      border: 1px solid #d9d1b7;
+      color: var(--color-muted);
+      white-space: nowrap;
+    }
+
+    .meal-name {
+      font-family: var(--font-head);
+      font-size: 0.92rem;
+      line-height: 1.2;
+    }
+
+    .meal-meta {
+      font-size: 0.73rem;
+      color: var(--color-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .meal-note {
+      font-size: 0.74rem;
+      color: var(--color-faint);
+      line-height: 1.35;
+      margin-top: auto;
+    }
+
+    .side-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .mini-list {
+      padding: 16px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mini-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee5cb;
+    }
+
+    .mini-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .mini-left {
+      display: flex;
+      gap: 10px;
+    }
+
+    .mini-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--color-surface-alt);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .mini-name {
+      font-size: 0.86rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .mini-sub {
+      font-size: 0.73rem;
+      color: var(--color-muted);
+    }
+
+    .mini-score {
+      font-size: 0.74rem;
+      color: var(--color-faint);
+      white-space: nowrap;
+    }
+
+    .tips-box {
+      padding: 16px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .tip {
+      background: #fffaf0;
+      border: 1px solid #ece1bf;
+      border-radius: 12px;
+      padding: 11px 12px;
+    }
+
+    .tip strong {
+      display: block;
+      font-size: 0.8rem;
+      margin-bottom: 3px;
+    }
+
+    .tip span {
+      font-size: 0.75rem;
+      color: var(--color-muted);
+      line-height: 1.4;
+    }
+
+    .legend {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 0 18px 18px;
+    }
+
+    .legend span {
+      font-size: 0.72rem;
+      color: var(--color-muted);
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid #ddd4b8;
+      background: #fff;
+    }
+
+    .empty-note {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: var(--color-lilac);
+      border: 1px solid #ddd3ee;
+      font-size: 0.78rem;
+      color: #5c5270;
+    }
+
+    @media (max-width: 1180px) {
+      .planner-layout,
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .sidebar {
+        display: none;
+      }
+
+      .content,
+      .topbar {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .page-intro {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <aside class="sidebar">
+      <div class="logo">
+        <h1>Plateful</h1>
+        <p>your recipe space</p>
+      </div>
+
+      <nav>
+        <a href="#">Home</a>
+        <a href="#">Explore</a>
+        <a href="#">My Recipes</a>
+        <a href="#">Saved</a>
+        <a href="#">Following</a>
+        <a href="#" class="active">Meal Planner</a>
+        <hr class="nav-divider" />
+        <a href="#">Profile</a>
+        <a href="#">Settings</a>
+      </nav>
+
+      <div class="sidebar-user">
+        <div class="avatar">JL</div>
+        <div>
+          <p class="name">Jamie Lee</p>
+          <p class="handle">@jamiecooks</p>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <span class="hi">Meal Planner</span>
+          <span class="date">Week of 30 March</span>
+        </div>
+
+        <div class="topbar-right">
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="page-intro">
+          <div>
+            <h2>Your weekly meal plan</h2>
+            <p>Preview only: this page shows how saved recipes can be randomly arranged into breakfast, lunch, and dinner for a full week.</p>
+          </div>
+
+          <div class="planner-actions">
+            <button class="btn-solid">Shuffle week</button>
+            <button class="btn-soft">Shuffle one day</button>
+          </div>
+        </div>
+
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="label">Saved recipes pool</div>
+            <div class="value">61</div>
+            <div class="hint">available for random selection</div>
+          </div>
+          <div class="summary-card">
+            <div class="label">Meals filled</div>
+            <div class="value">21</div>
+            <div class="hint">3 meals × 7 days</div>
+          </div>
+          <div class="summary-card">
+            <div class="label">Quickest meal</div>
+            <div class="value">15 min</div>
+            <div class="hint">Warm Halloumi Salad</div>
+          </div>
+          <div class="summary-card">
+            <div class="label">Planner mode</div>
+            <div class="value">Random</div>
+            <div class="hint">using recipes from Saved only</div>
+          </div>
+        </div>
+
+        <div class="planner-layout">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>Weekly planner table</h3>
+                <p>Each cell is a saved recipe suggestion for that meal slot.</p>
+              </div>
+              <div class="meal-tag">demo layout</div>
+            </div>
+
+            <div class="week-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Meal</th>
+                    <th>Monday</th>
+                    <th>Tuesday</th>
+                    <th>Wednesday</th>
+                    <th>Thursday</th>
+                    <th>Friday</th>
+                    <th>Saturday</th>
+                    <th>Sunday</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="meal-label">Breakfast</td>
+                    <td class="meal-cell"><div class="meal-card breakfast"><div class="meal-top"><span class="meal-emoji">🥐</span><span class="meal-tag">Saved</span></div><div class="meal-name">Almond Croissants</div><div class="meal-meta"><span>Baking</span><span>⭐ 4.7</span><span>4 hrs</span></div><div class="meal-note">Weekend-style breakfast picked from your saved list.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card breakfast"><div class="meal-top"><span class="meal-emoji">🍳</span><span class="meal-tag">Quick</span></div><div class="meal-name">Shakshuka</div><div class="meal-meta"><span>Middle Eastern</span><span>⭐ 4.7</span><span>25 min</span></div><div class="meal-note">Works well as a warm breakfast or brunch option.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card breakfast"><div class="meal-top"><span class="meal-emoji">🍮</span><span class="meal-tag">Treat</span></div><div class="meal-name">Crème Caramel</div><div class="meal-meta"><span>Dessert</span><span>⭐ 4.9</span><span>1.5 hrs</span></div><div class="meal-note">A lighter sweet pick for a flexible morning plan.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card breakfast"><div class="meal-top"><span class="meal-emoji">🍞</span><span class="meal-tag">Batch</span></div><div class="meal-name">Sourdough Focaccia</div><div class="meal-meta"><span>Baking</span><span>⭐ 4.8</span><span>3 hrs</span></div><div class="meal-note">Can be prepped ahead and paired with eggs or spreads.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card breakfast"><div class="meal-top"><span class="meal-emoji">🥗</span><span class="meal-tag">Fresh</span></div><div class="meal-name">Warm Halloumi Salad</div><div class="meal-meta"><span>Vegetarian</span><span>⭐ 4.6</span><span>15 min</span></div><div class="meal-note">Fast option when you want something savoury and light.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card breakfast"><div class="meal-top"><span class="meal-emoji">🍰</span><span class="meal-tag">Sweet</span></div><div class="meal-name">Brown Butter Tart</div><div class="meal-meta"><span>Dessert</span><span>⭐ 4.9</span><span>1 hr</span></div><div class="meal-note">Saved dessert reused here as a weekend brunch table item.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card breakfast"><div class="meal-top"><span class="meal-emoji">🥐</span><span class="meal-tag">Saved</span></div><div class="meal-name">Almond Croissants</div><div class="meal-meta"><span>Baking</span><span>⭐ 4.7</span><span>4 hrs</span></div><div class="meal-note">Repeated here to show the preview can reuse saved recipes.</div></div></td>
+                  </tr>
+
+                  <tr>
+                    <td class="meal-label">Lunch</td>
+                    <td class="meal-cell"><div class="meal-card lunch"><div class="meal-top"><span class="meal-emoji">🥣</span><span class="meal-tag">Comfort</span></div><div class="meal-name">Vegetable Harira</div><div class="meal-meta"><span>Soup</span><span>⭐ 4.6</span><span>45 min</span></div><div class="meal-note">Great make-ahead lunch from your saved Moroccan recipes.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card lunch"><div class="meal-top"><span class="meal-emoji">🥗</span><span class="meal-tag">Quick</span></div><div class="meal-name">Warm Halloumi Salad</div><div class="meal-meta"><span>Vegetarian</span><span>⭐ 4.6</span><span>15 min</span></div><div class="meal-note">A short prep lunch for busy weekdays.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card lunch"><div class="meal-top"><span class="meal-emoji">🍜</span><span class="meal-tag">Saved</span></div><div class="meal-name">Spicy Miso Ramen</div><div class="meal-meta"><span>Japanese</span><span>⭐ 4.8</span><span>25 min</span></div><div class="meal-note">Randomly selected from recently saved recipes.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card lunch"><div class="meal-top"><span class="meal-emoji">🍞</span><span class="meal-tag">Shareable</span></div><div class="meal-name">Sourdough Focaccia</div><div class="meal-meta"><span>Baking</span><span>⭐ 4.8</span><span>3 hrs</span></div><div class="meal-note">Good for leftovers and picnic-style lunches.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card lunch"><div class="meal-top"><span class="meal-emoji">🥘</span><span class="meal-tag">Hearty</span></div><div class="meal-name">Lamb Tagine</div><div class="meal-meta"><span>Moroccan</span><span>⭐ 4.9</span><span>2.5 hrs</span></div><div class="meal-note">A bigger lunch slot before the weekend.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card lunch"><div class="meal-top"><span class="meal-emoji">🍳</span><span class="meal-tag">Flexible</span></div><div class="meal-name">Shakshuka</div><div class="meal-meta"><span>Middle Eastern</span><span>⭐ 4.7</span><span>25 min</span></div><div class="meal-note">Can fit lunch or brunch depending on the day.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card lunch"><div class="meal-top"><span class="meal-emoji">🥣</span><span class="meal-tag">Batch</span></div><div class="meal-name">Vegetable Harira</div><div class="meal-meta"><span>Soup</span><span>⭐ 4.6</span><span>45 min</span></div><div class="meal-note">Good leftover choice for an easy Sunday lunch.</div></div></td>
+                  </tr>
+
+                  <tr>
+                    <td class="meal-label">Dinner</td>
+                    <td class="meal-cell"><div class="meal-card dinner"><div class="meal-top"><span class="meal-emoji">🥘</span><span class="meal-tag">Popular</span></div><div class="meal-name">Lamb Tagine</div><div class="meal-meta"><span>Moroccan</span><span>⭐ 4.9</span><span>2.5 hrs</span></div><div class="meal-note">A strong dinner anchor selected from your top saved dishes.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card dinner"><div class="meal-top"><span class="meal-emoji">🍜</span><span class="meal-tag">Warm</span></div><div class="meal-name">Spicy Miso Ramen</div><div class="meal-meta"><span>Japanese</span><span>⭐ 4.8</span><span>25 min</span></div><div class="meal-note">Good cooler-night option for a weekday dinner.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card dinner"><div class="meal-top"><span class="meal-emoji">🥘</span><span class="meal-tag">Hearty</span></div><div class="meal-name">Lamb Tagine</div><div class="meal-meta"><span>Moroccan</span><span>⭐ 4.9</span><span>2.5 hrs</span></div><div class="meal-note">Repeated to show random planning can reuse favourites.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card dinner"><div class="meal-top"><span class="meal-emoji">🥣</span><span class="meal-tag">Comfort</span></div><div class="meal-name">Vegetable Harira</div><div class="meal-meta"><span>Soup</span><span>⭐ 4.6</span><span>45 min</span></div><div class="meal-note">Simple dinner when you want something lighter.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card dinner"><div class="meal-top"><span class="meal-emoji">🍳</span><span class="meal-tag">One-pan</span></div><div class="meal-name">Shakshuka</div><div class="meal-meta"><span>Middle Eastern</span><span>⭐ 4.7</span><span>25 min</span></div><div class="meal-note">Fast dinner picked from the same saved pool.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card dinner"><div class="meal-top"><span class="meal-emoji">🍜</span><span class="meal-tag">Saved</span></div><div class="meal-name">Spicy Miso Ramen</div><div class="meal-meta"><span>Japanese</span><span>⭐ 4.8</span><span>25 min</span></div><div class="meal-note">Easy Saturday dinner after a busy day out.</div></div></td>
+                    <td class="meal-cell"><div class="meal-card dinner"><div class="meal-top"><span class="meal-emoji">🍞</span><span class="meal-tag">Sharing</span></div><div class="meal-name">Sourdough Focaccia</div><div class="meal-meta"><span>Baking</span><span>⭐ 4.8</span><span>3 hrs</span></div><div class="meal-note">Paired with soup or salad for a slower Sunday evening.</div></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="legend">
+              <span>Breakfast = yellow</span>
+              <span>Lunch = green</span>
+              <span>Dinner = peach</span>
+              <span>Source = recipes from Saved</span>
+            </div>
+          </section>
+
+          <div class="side-stack">
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Saved recipes pool</h3>
+                  <p>Examples of recipes the planner can draw from.</p>
+                </div>
+              </div>
+
+              <div class="mini-list">
+                <div class="mini-item">
+                  <div class="mini-left">
+                    <div class="mini-icon">🥘</div>
+                    <div>
+                      <div class="mini-name">Lamb Tagine</div>
+                      <div class="mini-sub">Moroccan • 2.5 hrs</div>
+                    </div>
+                  </div>
+                  <div class="mini-score">⭐ 4.9</div>
+                </div>
+
+                <div class="mini-item">
+                  <div class="mini-left">
+                    <div class="mini-icon">🍳</div>
+                    <div>
+                      <div class="mini-name">Shakshuka</div>
+                      <div class="mini-sub">Middle Eastern • 25 min</div>
+                    </div>
+                  </div>
+                  <div class="mini-score">⭐ 4.7</div>
+                </div>
+
+                <div class="mini-item">
+                  <div class="mini-left">
+                    <div class="mini-icon">🍞</div>
+                    <div>
+                      <div class="mini-name">Sourdough Focaccia</div>
+                      <div class="mini-sub">Baking • 3 hrs</div>
+                    </div>
+                  </div>
+                  <div class="mini-score">⭐ 4.8</div>
+                </div>
+
+                <div class="mini-item">
+                  <div class="mini-left">
+                    <div class="mini-icon">🥣</div>
+                    <div>
+                      <div class="mini-name">Vegetable Harira</div>
+                      <div class="mini-sub">Soup • 45 min</div>
+                    </div>
+                  </div>
+                  <div class="mini-score">⭐ 4.6</div>
+                </div>
+
+                <div class="mini-item">
+                  <div class="mini-left">
+                    <div class="mini-icon">🍜</div>
+                    <div>
+                      <div class="mini-name">Spicy Miso Ramen</div>
+                      <div class="mini-sub">Japanese • 25 min</div>
+                    </div>
+                  </div>
+                  <div class="mini-score">⭐ 4.8</div>
+                </div>
+              </div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
