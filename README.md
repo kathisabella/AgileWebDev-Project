@@ -24,13 +24,11 @@ Plateful is a web-based recipe-sharing platform that provides a seamless and enj
 
 ## Getting Started
 
-All commands below should be run from inside the `main/` folder.
-
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/kathisabella/AgileWebDev-Project.git
-cd AgileWebDev-Project/main
+git clone https://github.com/kathisabella/Plateful-AgileWD-Project-2026.git
+cd Plateful-AgileWD-Project-2026
 ```
 
 ### 2. Create and activate a virtual environment
@@ -55,8 +53,10 @@ pip install -r requirements.txt
 
 ### 4. Set up environment variables
 
+This project uses environment variables stored in a `.env` file.
+
 ```bash
-cp .env.example .env
+touch .env
 ```
 
 Open `.env` and fill in any required values.
@@ -64,7 +64,7 @@ Open `.env` and fill in any required values.
 ### 5. Run the app
 
 ```bash
-flask --app app run --debug
+python app.py
 ```
 
 ### 6. Open in browser
@@ -83,43 +83,55 @@ Press `Ctrl + C` to stop. Run `deactivate` to exit the virtual environment.
 
 ```
 Plateful-AgileWD-Project-2026/
+├── app.py
 ├── CITS3403-User Stories.pdf
+├── ERD
+│   └── ERD_Plateful.png
+├── main
+│   ├── __init__.py
+│   ├── config.py
+│   ├── mealplanner.py
+│   ├── routes.py
+│   ├── static
+│   │   ├── login.js
+│   │   ├── profile.js
+│   │   ├── recipe_form.js
+│   │   └── styles.css
+│   └── templates
+│       ├── 404.html
+│       ├── base_auth.html
+│       ├── base.html
+│       ├── dashboard.html
+│       ├── edit_recipe.html
+│       ├── explore.html
+│       ├── following.html
+│       ├── forgot_password.html
+│       ├── login.html
+│       ├── mealplanner.html
+│       ├── my_recipes.html
+│       ├── privacy.html
+│       ├── profile.html
+│       ├── recipe_details.html
+│       ├── saved_recipe.html
+│       ├── settings.html
+│       ├── terms.html
+│       └── upload_recipe.html
 ├── README.md
-└── main/
-    ├── app.py
-    ├── requirements.txt
-    ├── .env.example
-    ├── static/
-    │   ├── styles.css
-    │   └── main.js
-    └── templates/
-        ├── 404.html
-        ├── dashboard.html
-        ├── edit_recipe.html
-        ├── explore.html
-        ├── forgot_password.html
-        ├── login.html
-        ├── mealplanner.html
-        ├── my_recipes.html
-        ├── privacy.html
-        ├── profile.html
-        ├── recipe_details.html
-        ├── saved_recipe.html
-        ├── settings.html
-        ├── terms.html
-        └── upload_recipe.html
+└── requirements.txt
 ```
+
+> Note: The application uses a modular Flask structure where the main app is defined in `main/__init__.py` and routes are organised in `main/routes.py`.
 
 ---
 
 ## Tech Stack
 
-| Layer     | Technology                  |
-|-----------|-----------------------------|
-| Backend   | Python · Flask              |
-| Frontend  | HTML · CSS · JavaScript     |
-| Templating | Jinja2                     |
-| Fonts     | Google Fonts (Fraunces, Figtree) |
+| Layer      | Technology                       |
+|------------|----------------------------------|
+| Backend    | Python · Flask                   |
+| Frontend   | HTML · CSS · JavaScript          |
+| Templating | Jinja2                           |
+| Fonts      | Google Fonts (Fraunces, Figtree) |
 
 ## Further Documentation (To Be Changed)
 **This is for linking to additional user documentations (if there are any), else delete if not needed.**
