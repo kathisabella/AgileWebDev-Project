@@ -56,7 +56,7 @@ pip install -r requirements.txt
 This project uses environment variables stored in a `.env` file.
 
 ```bash
-touch .env
+echo "secret-key" >> .env
 ```
 
 Open `.env` and fill in any required values.
