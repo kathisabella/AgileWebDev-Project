@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from dotenv import load_dotenv
+from form import LoginForm, RegisterForm
 import os
 
-from extensions import db
+from extensions import db, migrate
+from models import Recipe, User
 from routes.mealplanner import get_meal_planner_context
 
 load_dotenv()
@@ -17,21 +19,48 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///plateful.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+migrate.init_app(app, db)
+
 
 
 # ---------- Auth ----------
 
 @app.route('/', methods=['GET'])
 def login_page():
-    return render_template('login.html')
+    return render_template('login.html', login_form=LoginForm(), signup_form=RegisterForm())
 
 @app.route('/login', methods=['POST'])
 def login():
-    return redirect(url_for('dashboard'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and user.check_password(form.password.data):
+            session['user_id'] = user.id
+            session['username'] = user.username
+            session['display_name'] = user.display_name or user.username
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid email or password.', 'error')
+            return redirect(url_for('login_page'))
+    return redirect(url_for('login_page'))
 
 @app.route('/signup', methods=['POST'])
 def signup():
-    return redirect(url_for('dashboard'))
+    form = RegisterForm()
+    if form.validate_on_submit():
+        existing_user = User.query.filter_by(email=form.email.data).first()
+        if existing_user:
+            flash('An account with that email already exists.', 'error')
+            return redirect(url_for('login_page'))
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        session['user_id'] = user.id
+        session['username'] = user.username
+        session['display_name'] = user.username
+        return redirect(url_for('dashboard'))
+    return redirect(url_for('login_page'))
 
 @app.route('/logout', methods=['POST'])
 def logout():
@@ -53,11 +82,14 @@ def dashboard():
 
 @app.route('/explore')
 def explore():
-    return render_template('explore.html')
+    recipes = Recipe.query.all()
+    return render_template('explore.html', recipes=recipes)
 
 @app.route('/my-recipes')
 def my_recipes():
-    return render_template('my_recipes.html')
+    user_id = session.get('user_id', 1)
+    recipes = Recipe.query.filter_by(user_id=user_id).all()
+    return render_template('my_recipes.html', recipes=recipes)
 
 @app.route('/saved')
 def saved_recipes():
@@ -104,22 +136,51 @@ def meal_planner():
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_recipe():
     if request.method == 'POST':
-        return redirect(url_for('dashboard'))
+        ingredients = '\n'.join(i for i in request.form.getlist('ingredients') if i.strip())
+        steps = '\n'.join(s for s in request.form.getlist('steps') if s.strip())
+        recipe = Recipe(
+            user_id=session.get('user_id', 1),
+            title=request.form.get('title', '').strip(),
+            cuisine=request.form.get('cuisine', '').strip(),
+            difficulty=request.form.get('difficulty', '').strip(),
+            prep_time=request.form.get('prep_time', '').strip(),
+            servings=request.form.get('servings') or None,
+            description=request.form.get('description', '').strip(),
+            ingredients=ingredients,
+            steps=steps,
+        )
+        db.session.add(recipe)
+        db.session.commit()
+        return redirect(url_for('recipe_details', recipe_id=recipe.id))
     return render_template('upload_recipe.html')
 
 @app.route('/recipe/<int:recipe_id>', methods=['GET'])
 def recipe_details(recipe_id):
-    return render_template('recipe_details.html', recipe_id=recipe_id)
+    recipe = Recipe.query.get_or_404(recipe_id)
+    return render_template('recipe_details.html', recipe=recipe, recipe_id=recipe_id)
 
 @app.route('/recipe/<int:recipe_id>/edit', methods=['GET', 'POST'])
 def edit_recipe(recipe_id):
+    recipe = Recipe.query.get_or_404(recipe_id)
     if request.method == 'POST':
+        recipe.title = request.form.get('title', '').strip()
+        recipe.cuisine = request.form.get('cuisine', '').strip()
+        recipe.difficulty = request.form.get('difficulty', '').strip()
+        recipe.prep_time = request.form.get('prep_time', '').strip()
+        recipe.servings = request.form.get('servings') or None
+        recipe.description = request.form.get('description', '').strip()
+        recipe.ingredients = '\n'.join(i for i in request.form.getlist('ingredients') if i.strip())
+        recipe.steps = '\n'.join(s for s in request.form.getlist('steps') if s.strip())
+        db.session.commit()
         return redirect(url_for('recipe_details', recipe_id=recipe_id))
-    return render_template('edit_recipe.html', recipe_id=recipe_id)
+    return render_template('edit_recipe.html', recipe=recipe, recipe_id=recipe_id)
 
 @app.route('/recipe/<int:recipe_id>/delete', methods=['POST'])
 def delete_recipe(recipe_id):
-    return redirect(url_for('dashboard'))
+    recipe = Recipe.query.get_or_404(recipe_id)
+    db.session.delete(recipe)
+    db.session.commit()
+    return redirect(url_for('my_recipes'))
 
 @app.route('/recipe/<int:recipe_id>/save', methods=['POST'])
 def save_recipe(recipe_id):
@@ -146,7 +207,4 @@ def page_not_found(error):
 
 # ---------- Entry point ----------
 
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+app.run(debug=True)

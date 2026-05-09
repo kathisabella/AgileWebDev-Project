@@ -45,8 +45,8 @@
       <h3>Ingredients</h3>
       <div class="ing-card">
         <div class="ing-list">
-          {% if recipe.ingredients|default([]) %}
-            {% for ingredient in recipe.ingredients %}
+          {% if recipe.ingredients_list %}
+            {% for ingredient in recipe.ingredients_list %}
             <p>{{ ingredient }}</p>
             {% endfor %}
           {% else %}
@@ -59,8 +59,8 @@
     <div class="section">
       <h3>Steps</h3>
       <div class="steps-card">
-        {% if recipe.steps|default([]) %}
-          {% for step in recipe.steps %}
+        {% if recipe.steps_list %}
+          {% for step in recipe.steps_list %}
           <p>{{ loop.index }}. {{ step }}</p>
           {% endfor %}
         {% else %}

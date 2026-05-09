@@ -68,10 +68,17 @@
     <div class="form-group">
       <label for="ingredient-0">Ingredients</label>
       <div class="list-input" id="ingredients-list">
+        {% for ingredient in recipe.ingredients_list %}
+        <div class="item-row">
+          <input type="text" name="ingredients" value="{{ ingredient }}"/>
+          <button type="button" class="remove-btn">✕</button>
+        </div>
+        {% else %}
         <div class="item-row">
           <input type="text" id="ingredient-0" name="ingredients" value=""/>
           <button type="button" class="remove-btn">✕</button>
         </div>
+        {% endfor %}
       </div>
       <div class="add-btn" data-list="ingredients-list" data-name="ingredients" data-tag="input">+ Add ingredient</div>
     </div>
@@ -79,10 +86,17 @@
     <div class="form-group">
       <label for="step-0">Steps</label>
       <div class="list-input" id="steps-list">
+        {% for step in recipe.steps_list %}
+        <div class="item-row">
+          <textarea name="steps" rows="2">{{ step }}</textarea>
+          <button type="button" class="remove-btn">✕</button>
+        </div>
+        {% else %}
         <div class="item-row">
           <textarea id="step-0" name="steps" rows="2"></textarea>
           <button type="button" class="remove-btn">✕</button>
         </div>
+        {% endfor %}
       </div>
       <div class="add-btn" data-list="steps-list" data-name="steps" data-tag="textarea">+ Add step</div>
     </div>
