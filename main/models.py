@@ -1,11 +1,36 @@
 from extensions import db
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(30), nullable=False, unique=True)
+    email = db.Column(db.String(150), nullable=False, unique=True)
+    password_hash = db.Column(db.String(256), nullable=False)
+    display_name = db.Column(db.String(30), nullable=True)
+    biography = db.Column(db.String(500), nullable=True)
+    joined_date   = db.Column(db.DateTime, default=datetime.utcnow)
+    profile_image = db.Column(db.String(200), nullable=True)
+
+    recipes = db.relationship('Recipe', back_populates='author', lazy=True)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def __repr__(self):
+        return f"<User {self.username}>"
 
 
 class Recipe(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     # Will become a FK once the User model is added
-    user_id = db.Column(db.Integer, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    
+    author  = db.relationship('User', back_populates='recipes')
 
     title = db.Column(db.String(120), nullable=False)
     cuisine = db.Column(db.String(50), nullable=True)

@@ -1,10 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from dotenv import load_dotenv
 from form import LoginForm, RegisterForm
 import os
 
-from extensions import db
-from models import Recipe
+from extensions import db, migrate
+from models import Recipe, User
 from routes.mealplanner import get_meal_planner_context
 
 load_dotenv()
@@ -19,9 +19,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///plateful.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+migrate.init_app(app, db)
 
-with app.app_context():
-    db.create_all()
 
 
 # ---------- Auth ----------
@@ -32,11 +31,36 @@ def login_page():
 
 @app.route('/login', methods=['POST'])
 def login():
-    return redirect(url_for('dashboard'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and user.check_password(form.password.data):
+            session['user_id'] = user.id
+            session['username'] = user.username
+            session['display_name'] = user.display_name or user.username
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid email or password.', 'error')
+            return redirect(url_for('login_page'))
+    return redirect(url_for('login_page'))
 
 @app.route('/signup', methods=['POST'])
 def signup():
-    return redirect(url_for('dashboard'))
+    form = RegisterForm()
+    if form.validate_on_submit():
+        existing_user = User.query.filter_by(email=form.email.data).first()
+        if existing_user:
+            flash('An account with that email already exists.', 'error')
+            return redirect(url_for('login_page'))
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        session['user_id'] = user.id
+        session['username'] = user.username
+        session['display_name'] = user.username
+        return redirect(url_for('dashboard'))
+    return redirect(url_for('login_page'))
 
 @app.route('/logout', methods=['POST'])
 def logout():
@@ -183,7 +207,4 @@ def page_not_found(error):
 
 # ---------- Entry point ----------
 
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+app.run(debug=True)
