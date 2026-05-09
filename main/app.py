@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from dotenv import load_dotenv
+from form import LoginForm, RegisterForm
 import os
 
 from extensions import db
@@ -23,7 +24,7 @@ db.init_app(app)
 
 @app.route('/', methods=['GET'])
 def login_page():
-    return render_template('login.html')
+    return render_template('login.html', login_form=LoginForm(), signup_form=RegisterForm())
 
 @app.route('/login', methods=['POST'])
 def login():
