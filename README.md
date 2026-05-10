@@ -61,19 +61,32 @@ echo "secret-key" >> .env
 
 Open `.env` and fill in any required values.
 
-### 5. Run the app
+### 5. Create the database
+Run the database migrations:
+
+```bash
+flask --app app db upgrade
+```
+
+This will create:
+
+```
+main/plateful.db
+```
+
+### 6. Run the app
 
 ```bash
 python app.py
 ```
 
-### 6. Open in browser
+### 7. Open in browser
 
 ```
 http://127.0.0.1:5000
 ```
 
-### 7. Stop the server
+### 8. Stop the server
 
 Press `Ctrl + C` to stop. Run `deactivate` to exit the virtual environment.
 
