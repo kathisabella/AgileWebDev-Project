@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 default_db_path = 'sqlite:///' + os.path.join(basedir, 'plateful.db')
