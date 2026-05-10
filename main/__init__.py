@@ -1,6 +1,3 @@
-from dotenv import load_dotenv
-load_dotenv()
-
 from flask import Flask
 from flask import Config
 from flask_migrate import Migrate
