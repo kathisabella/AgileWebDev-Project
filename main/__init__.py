@@ -1,6 +1,3 @@
-from dotenv import load_dotenv
-load_dotenv()
-
 from flask import Flask
 from flask import Config
 from flask_migrate import Migrate
@@ -15,4 +12,4 @@ db = SQLAlchemy(app)
 migration = Migrate(app, db)
 
 from main import routes
-## from main import models
+from main import models
