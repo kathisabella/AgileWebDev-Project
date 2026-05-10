@@ -135,6 +135,12 @@ Plateful-AgileWD-Project-2026/
 
 > Note: The application uses a modular Flask structure where the main app is defined in `main/__init__.py` and routes are organised in `main/routes.py`.
 
+> Database Notes:
+> - SQLite is used for local development
+> - Database file is ignored using `.gitignore`
+> - Alembic/Flask-Migrate is used for schema migrations
+> - Existing migrations are stored in: `migrations/versions/`
+
 ---
 
 ## Tech Stack
