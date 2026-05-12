@@ -105,7 +105,7 @@
         <div class="feed">
           {% for item in activity|default([]) %}
           <div class="feed-item">
-            <span class="feed-text">{{ item.text|safe }}</span>
+            <span class="feed-text">{{ item.text }}</span>
             <span class="feed-time">{{ item.time }}</span>
           </div>
           {% else %}

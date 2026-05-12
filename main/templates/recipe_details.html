@@ -47,7 +47,7 @@
         <div class="ing-list">
           {% if recipe.ingredients|default([]) %}
             {% for ingredient in recipe.ingredients %}
-            <p>{{ ingredient }}</p>
+            <p>{{ ingredient.name }}</p>
             {% endfor %}
           {% else %}
           <p class="empty-state">No ingredients added yet.</p>
@@ -61,7 +61,7 @@
       <div class="steps-card">
         {% if recipe.steps|default([]) %}
           {% for step in recipe.steps %}
-          <p>{{ loop.index }}. {{ step }}</p>
+          <p>{{ loop.index }}. {{ step.instruction }}</p>
           {% endfor %}
         {% else %}
         <p class="empty-state">No steps added yet.</p>

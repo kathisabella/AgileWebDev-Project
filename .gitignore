@@ -26,3 +26,10 @@ instance/
 # ----- OS junk -----
 .DS_Store
 Thumbs.db
+
+# ----- SQLite database files/SQLAlchemy -----
+*.db
+*.sqlite3
+
+# ----- Flask Migrations Cache -----
+instance/
