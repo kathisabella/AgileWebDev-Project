@@ -44,7 +44,7 @@
     <div class="panel-header">
       <div>
         <h3>Your own meal planner table</h3>
-        <p>Click "shuffle one day" button to generate daily meal planner and delete what you do not like. Maxium 7 days to shuffle.</p>
+        <p>Click "Shuffle one day" to add one day meal planner at a time. You can delete any day you do not want. Maximum 7 days.</p>
       </div>
       
       <div class="planner-actions">
@@ -69,7 +69,8 @@
                     <span>Day {{ loop.index }}</span>
 
                     {% if day in generated_days %}
-                      <a href="{{ url_for('meal_planner', action='delete_day', day=day) }}" class="delete-day-link">
+                      <a href="{{ url_for('meal_planner', action='delete_day', day=day) }}"
+                        class="delete-day-btn">
                         Delete
                       </a>
                     {% endif %}

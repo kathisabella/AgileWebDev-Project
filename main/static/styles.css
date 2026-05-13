@@ -286,9 +286,18 @@ body.page-meal-planner .page-intro h2 { font-size: 1.55rem; }
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: 0.2s ease;
 }
 .btn-soft { background: #fff; color: var(--color-text); }
 .btn-solid { background: var(--color-surface); color: var(--color-text); }
+.btn-solid:hover {
+  background: #fff8da;
+  border-color: #b9ad86;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
 
 .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 26px; }
 .summary-card { background: var(--color-surface); border: 1px solid #d8d0b0; border-radius: 14px; padding: 16px 18px; }
@@ -353,6 +362,37 @@ thead th:first-child { width: 98px; background: #f6f3e5; }
   body.page-meal-planner .page-intro { flex-direction: column; }
 }
 
+
+.day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ─── Delete button in head row of table ─── */
+.delete-day-btn {
+    padding: 4px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+
+    background-color: white;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    text-decoration: none;
+    color: #374151;
+
+    transition: 0.2s ease;
+
+    display: inline-block;
+    cursor: pointer;
+}
+
+.delete-day-btn:hover {
+    background-color: #f3f4f6;
+    border-color: #9ca3af;
+}
 
 /* ════════════════════════════════════════════
    PAGE: EXPLORE
@@ -1451,3 +1491,11 @@ body.page-profile .columns { display: grid; grid-template-columns: 1fr 260px; ga
 .logout-form { margin-top: 10px; }
 .logout-btn { width: 100%; padding: 8px 12px; background: none; border: 1.5px solid #d8d0b0; border-radius: 8px; font-family: var(--font-body); font-size: 0.82rem; font-weight: 600; color: var(--color-muted); cursor: pointer; text-align: left; transition: background 0.12s, color 0.12s; }
 .logout-btn:hover { background: #fdf0f0; border-color: #e8b0b0; color: #c0392b; }
+
+
+
+/* ════════════════════════════════════════════
+   PAGE: MEALPLANNER
+════════════════════════════════════════════ */
+
+

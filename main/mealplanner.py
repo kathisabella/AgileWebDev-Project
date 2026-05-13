@@ -101,14 +101,16 @@ def get_meal_planner_context(days, meal_types, saved_recipes, user):
 
     current_plan = session["meal_plan"]
 
-    if shuffle_type == "day":
+    if action == "shuffle_day":
         if len(current_plan) < 7:
             next_day = f"Day {len(current_plan) + 1}"
             current_plan[next_day] = make_one_day_plan(current_plan, meal_types, saved_recipes)
             session["meal_plan"] = current_plan
+            session.modified = True
 
     elif action == "delete_day":
         session["meal_plan"] = delete_day_and_reorder(current_plan, day_to_delete)
+        session.modified = True
 
     stats = get_plan_stats(session["meal_plan"], saved_recipes)
 
