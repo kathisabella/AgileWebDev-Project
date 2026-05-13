@@ -1,16 +1,17 @@
 from flask import render_template, request, redirect, url_for, session
+from sqlalchemy import func
 
 from main.forms import LoginForm, RegisterForm
 from main import app, db
 from main.mealplanner import get_meal_planner_context
 from main.models import (
-    User, 
-    Recipe, 
-    Ingredient, 
-    RecipeStep, 
-    SavedRecipe, 
+    User,
+    Recipe,
+    Ingredient,
+    RecipeStep,
+    SavedRecipe,
     Follow,
-    Activity,   
+    Activity,
 )
 
 def get_current_user():
@@ -129,6 +130,44 @@ def dashboard():
         .count()
     )
 
+    recent_saved = [
+        item.recipe for item in (
+            SavedRecipe.query
+            .filter_by(user_id=user.id)
+            .order_by(SavedRecipe.saved_at.desc())
+            .limit(3)
+            .all()
+        )
+    ]
+
+    top_recipes_raw = (
+        db.session.query(Recipe, func.count(SavedRecipe.id).label("save_count"))
+        .outerjoin(SavedRecipe, SavedRecipe.recipe_id == Recipe.id)
+        .filter(Recipe.author_id == user.id)
+        .group_by(Recipe.id)
+        .order_by(func.count(SavedRecipe.id).desc())
+        .limit(5)
+        .all()
+    )
+    top_recipes = [{"recipe": r, "save_count": count} for r, count in top_recipes_raw]
+
+    raw_activity = (
+        Activity.query
+        .filter_by(user_id=user.id)
+        .order_by(Activity.created_at.desc())
+        .limit(5)
+        .all()
+    )
+    activity_feed = []
+    for item in raw_activity:
+        if item.activity_type == "uploaded_recipe" and item.related_recipe:
+            text = f"Uploaded recipe: {item.related_recipe.title}"
+        elif item.activity_type == "saved_recipe" and item.related_recipe:
+            text = f"Saved recipe: {item.related_recipe.title}"
+        else:
+            text = item.activity_type
+        activity_feed.append({"text": text, "time": item.created_at.strftime("%d %b %Y")})
+
     return render_template(
         "dashboard.html",
         **user_context(user),
@@ -137,6 +176,9 @@ def dashboard():
         saved_count=saved_count,
         following_count=following_count,
         total_saves=total_saves,
+        recent_saved=recent_saved,
+        top_recipes=top_recipes,
+        activity_feed=activity_feed,
     )
 
 ## -------- Explore Page ---------------------------------------------
