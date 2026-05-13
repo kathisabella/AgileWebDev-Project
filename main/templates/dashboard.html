@@ -57,7 +57,22 @@
         <a href="{{ url_for('saved_recipes') }}">See all</a>
       </div>
       <div class="recipe-grid">
-        <p class="empty-state">No recipes added yet.</p>
+        {% for recipe in recent_saved %}
+        <div class="recipe-card">
+          <div class="recipe-thumb"></div>
+          <div class="recipe-body">
+            <p class="recipe-name">{{ recipe.title }}</p>
+            <p class="recipe-by">by {{ recipe.author.display_name }}</p>
+            <div class="recipe-meta">
+              <span class="tag">{{ recipe.cuisine }}</span>
+              <span>{{ recipe.prep_time }} min</span>
+            </div>
+            <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+          </div>
+        </div>
+        {% else %}
+        <p class="empty-state">No recipes saved yet.</p>
+        {% endfor %}
       </div>
     </section>
 
@@ -67,7 +82,14 @@
         <a href="{{ url_for('my_recipes') }}">Manage</a>
       </div>
       <ul class="pop-list">
+        {% for item in top_recipes %}
+        <li class="pop-item">
+          <a href="{{ url_for('recipe_details', recipe_id=item.recipe.id) }}" class="pop-title">{{ item.recipe.title }}</a>
+          <span class="pop-saves">{{ item.save_count }} save{{ 's' if item.save_count != 1 else '' }}</span>
+        </li>
+        {% else %}
         <p class="empty-state">No top recipes to show yet.</p>
+        {% endfor %}
       </ul>
     </section>
   </div>
@@ -78,7 +100,14 @@
         <h3>Activity</h3>
       </div>
       <div class="feed">
+        {% for item in activity_feed %}
+        <div class="feed-item">
+          <span class="feed-text">{{ item.text }}</span>
+          <span class="feed-time">{{ item.time }}</span>
+        </div>
+        {% else %}
         <p class="empty-state">No recent activity yet.</p>
+        {% endfor %}
       </div>
     </section>
 
