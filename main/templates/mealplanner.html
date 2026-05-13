@@ -17,14 +17,7 @@
 <div class="page-intro">
   <div>
     <h2>Meal planner</h2>
-    <p>Build your weekly planner from your saved recipes.</p>
-  </div>
-
-  <div class="planner-actions">
-    <a href="{{ url_for('meal_planner', shuffle='week') }}" class="btn-solid">Shuffle week</a>
-    {% if days %}
-      <a href="{{ url_for('meal_planner', shuffle='day', day=days[0]) }}" class="btn-soft">Shuffle one day</a>
-    {% endif %}
+    <p>Build your own meal planner from your saved recipes.</p>
   </div>
 </div>
 
@@ -44,21 +37,25 @@
     <div class="value">{{ stats.quickest_meal }}</div>
     <div class="hint"></div>
   </div>
-  <div class="summary-card">
-    <div class="label">Planner mode</div>
-    <div class="value">{{ stats.planner_mode }}</div>
-    <div class="hint"></div>
-  </div>
 </div>
 
 <div class="planner-layout">
   <section class="panel">
     <div class="panel-header">
       <div>
-        <h3>Weekly planner table</h3>
-        <p>Each cell is a saved recipe suggestion for that meal slot.</p>
+        <h3>Your own meal planner table</h3>
+        <p>Click "shuffle one day" button to generate daily meal planner and delete what you do not like. Maxium 7 days to shuffle.</p>
       </div>
-      <div class="meal-tag">{{ stats.planner_mode }}</div>
+      
+      <div class="planner-actions">
+        {% if generated_days|length < 7 %}
+          <a href="{{ url_for('meal_planner', action='shuffle_day') }}" class="btn-solid">
+            Shuffle one day
+          </a>
+        {% else %}
+          <button class="btn-solid" disabled>Maximum 7 days reached</button>
+        {% endif %}
+      </div>
     </div>
 
     <div class="week-table-wrap">
@@ -66,18 +63,30 @@
         <thead>
           <tr>
             <th>Meal</th>
-            {% for day in days %}
-              <th>{{ day }}</th>
-            {% endfor %}
+              {% for day in display_days %}
+                <th>
+                  <div class="day-header">
+                    <span>Day {{ loop.index }}</span>
+
+                    {% if day in generated_days %}
+                      <a href="{{ url_for('meal_planner', action='delete_day', day=day) }}" class="delete-day-link">
+                        Delete
+                      </a>
+                    {% endif %}
+                  </div>
+                </th>
+              {% endfor %}
           </tr>
         </thead>
         <tbody>
           {% for meal_type in meal_types %}
           <tr>
             <td class="meal-label">{{ meal_type }}</td>
-            {% for day in days %}
+
+            {% for day in display_days %}
               <td class="meal-cell">
-                {% set recipe = week_plan[day][meal_type] %}
+                {% set recipe = week_plan.get(day, {}).get(meal_type) %}
+
                 {% if recipe %}
                   <div class="meal-card {{ meal_type|lower }}">
                     <div class="meal-name">{{ recipe.name }}</div>
@@ -88,7 +97,7 @@
                   </div>
                 {% else %}
                   <div class="meal-card {{ meal_type|lower }}">
-                    <p class="empty-table">No recipe available</p>
+                    <p class="empty-table">No meals yet</p>
                   </div>
                 {% endif %}
               </td>
@@ -110,7 +119,7 @@
     <section class="panel">
       <div class="panel-header">
         <div>
-          <h3>Saved recipes pool</h3>
+          <h3>Shuffled recipes pool</h3>
           <p>Examples of recipes the planner can draw from.</p>
         </div>
       </div>
@@ -129,7 +138,7 @@
           </div>
         {% endfor %}
       {% else %}
-        <div class="empty-note">No saved recipes yet.</div>
+        <div class="empty-note">No shuffled recipes yet.</div>
       {% endif %}
     </section>
   </div>

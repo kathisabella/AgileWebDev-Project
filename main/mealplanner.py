@@ -34,37 +34,34 @@ def choose_recipe(meal_type, used_recipe_ids, saved_recipes):
     return selected_recipe
 
 
-def make_week_plan(days, meal_types, saved_recipes):
-    week_plan = {}
-    used_recipe_ids = []
-
-    for day in days:
-        week_plan[day] = {}
-
-        for meal_type in meal_types:
-            week_plan[day][meal_type] = choose_recipe(meal_type, used_recipe_ids, saved_recipes)
-
-    return week_plan
-
-
-def shuffle_single_day(current_plan, day, meal_types, saved_recipes):
+def make_one_day_plan(current_plan, meal_types, saved_recipes):
     used_recipe_ids = []
 
     for plan_day in current_plan:
-        if plan_day != day:
-            for meal_type in current_plan[plan_day]:
-                recipe = current_plan[plan_day][meal_type]
+        for meal_type in current_plan[plan_day]:
+            recipe = current_plan[plan_day][meal_type]
 
-                if recipe is not None:
-                    used_recipe_ids.append(recipe["id"])
+            if recipe is not None:
+                used_recipe_ids.append(recipe["id"])
 
-    current_plan[day] = {}
+    one_day_plan = {}
 
     for meal_type in meal_types:
-        current_plan[day][meal_type] = choose_recipe(meal_type, used_recipe_ids, saved_recipes)
+        one_day_plan[meal_type] = choose_recipe(meal_type, used_recipe_ids, saved_recipes)
 
-    return current_plan
+    return one_day_plan
 
+def delete_day_and_reorder(current_plan, day_to_delete):
+    if day_to_delete in current_plan:
+        current_plan.pop(day_to_delete)
+
+    old_day_plans = list(current_plan.values())
+    new_plan = {}
+
+    for index, day_plan in enumerate(old_day_plans, start=1):
+        new_plan[f"Day {index}"] = day_plan
+
+    return new_plan
 
 def get_plan_stats(week_plan, saved_recipes):
     meals_filled = 0
@@ -89,7 +86,6 @@ def get_plan_stats(week_plan, saved_recipes):
         "saved_count": len(saved_recipes),
         "meals_filled": meals_filled,
         "quickest_meal": quickest_meal,
-        "planner_mode": "Weekly"
     }
 
 
@@ -97,17 +93,31 @@ def get_meal_planner_context(days, meal_types, saved_recipes, user):
     shuffle_type = request.args.get("shuffle")
     shuffle_day = request.args.get("day")
 
+    action = request.args.get("action")
+    day_to_delete = request.args.get("day")
+
     if "meal_plan" not in session:
-        session["meal_plan"] = make_week_plan(days, meal_types, saved_recipes)
+        session["meal_plan"] = {}
 
-    if shuffle_type == "week":
-        session["meal_plan"] = make_week_plan(days, meal_types, saved_recipes)
+    current_plan = session["meal_plan"]
 
-    elif shuffle_type == "day" and shuffle_day in days:
-        current_plan = session["meal_plan"]
-        session["meal_plan"] = shuffle_single_day(current_plan, shuffle_day, meal_types, saved_recipes)
+    if shuffle_type == "day":
+        if len(current_plan) < 7:
+            next_day = f"Day {len(current_plan) + 1}"
+            current_plan[next_day] = make_one_day_plan(current_plan, meal_types, saved_recipes)
+            session["meal_plan"] = current_plan
+
+    elif action == "delete_day":
+        session["meal_plan"] = delete_day_and_reorder(current_plan, day_to_delete)
 
     stats = get_plan_stats(session["meal_plan"], saved_recipes)
+
+    generated_days = list(session["meal_plan"].keys())
+
+    if len(generated_days) == 0:
+        display_days = ["Day 1"]
+    else:
+        display_days = generated_days
 
     return {
         "page_title": "Plateful Meal Planner",
@@ -117,6 +127,8 @@ def get_meal_planner_context(days, meal_types, saved_recipes, user):
         "display_name": user["display_name"],
         "username": user["username"],
         "days": days,
+        "display_days": display_days,
+        "generated_days": generated_days,
         "meal_types": meal_types,
         "week_plan": session["meal_plan"],
         "saved_recipes": saved_recipes,
