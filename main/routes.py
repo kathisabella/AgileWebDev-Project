@@ -1,3 +1,4 @@
+from datetime import date
 from flask import render_template, request, redirect, url_for, session
 from sqlalchemy import func
 
@@ -110,6 +111,26 @@ def signup():
 
     return redirect(url_for("dashboard"))
 
+_TIPS = [
+    "Salt your pasta water until it tastes like the sea — it's your only chance to season the pasta itself.",
+    "Pat meat dry before searing. Moisture is the enemy of a good crust.",
+    "Taste as you go. Seasoning at the end can't fix under-seasoned layers.",
+    "Rest your meat after cooking — 5 minutes makes a big difference in juiciness.",
+    "Cold butter whisked into a sauce at the end gives it a glossy, restaurant finish.",
+    "Toast your spices in a dry pan before grinding to unlock deeper flavour.",
+    "Acid (lemon, vinegar) added at the end brightens a dish that tastes flat.",
+    "Use the pasta cooking water to loosen and bind your sauce — the starch is key.",
+    "Room-temperature eggs and dairy incorporate more evenly into batters.",
+    "A pinch of sugar balances acidic tomato sauces without making them sweet.",
+    "Slice meat against the grain to shorten muscle fibres and make it more tender.",
+    "Fresh herbs go in at the end; dried herbs go in early so they have time to bloom.",
+]
+
+
+def _daily_tip():
+    return _TIPS[date.today().timetuple().tm_yday % len(_TIPS)]
+
+
 ## -------- Dashboard ---------------------------------------------
 @app.route("/dashboard", methods=["GET"])
 def dashboard():
@@ -179,6 +200,7 @@ def dashboard():
         recent_saved=recent_saved,
         top_recipes=top_recipes,
         activity_feed=activity_feed,
+        tip=_daily_tip(),
     )
 
 ## -------- Explore Page ---------------------------------------------
