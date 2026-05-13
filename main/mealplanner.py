@@ -112,6 +112,10 @@ def get_meal_planner_context(days, meal_types, saved_recipes, user):
         session["meal_plan"] = delete_day_and_reorder(current_plan, day_to_delete)
         session.modified = True
 
+    elif action == "clear_all":
+        session["meal_plan"] = {}
+        session.modified = True
+
     stats = get_plan_stats(session["meal_plan"], saved_recipes)
 
     generated_days = list(session["meal_plan"].keys())

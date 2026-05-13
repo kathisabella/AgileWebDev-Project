@@ -394,6 +394,71 @@ thead th:first-child { width: 98px; background: #f6f3e5; }
     border-color: #9ca3af;
 }
 
+
+/* ─── Clear all button at the botton of table ─── */
+.clear-planner-btn {
+  border: 1px solid #d8d0b0;
+  border-radius: 10px;
+  padding: 9px 14px;
+  background: #fff;
+  color: var(--color-text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.clear-planner-btn:hover {
+  background: #fff8da;
+  border-color: #b9ad86;
+  transform: translateY(-1px);
+}
+
+.confirm-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.confirm-box {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  width: 360px;
+  max-width: 90%;
+  text-align: center;
+  border: 1px solid #ddd4b8;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.confirm-yes,
+.confirm-no {
+  border: 1px solid #d8d0b0;
+  border-radius: 10px;
+  padding: 8px 18px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.confirm-yes:hover,
+.confirm-no:hover {
+  background: #fff8da;
+}
+
 /* ════════════════════════════════════════════
    PAGE: EXPLORE
 ════════════════════════════════════════════ */

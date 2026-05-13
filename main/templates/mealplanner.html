@@ -32,11 +32,6 @@
     <div class="value">{{ stats.meals_filled }}</div>
     <div class="hint"></div>
   </div>
-  <div class="summary-card">
-    <div class="label">Quickest meal</div>
-    <div class="value">{{ stats.quickest_meal }}</div>
-    <div class="hint"></div>
-  </div>
 </div>
 
 <div class="planner-layout">
@@ -108,11 +103,10 @@
         </tbody>
       </table>
     </div>
-
     <div class="legend">
-      {% for meal_type in meal_types %}
-        <span>{{ meal_type }}</span>
-      {% endfor %}
+      <button type="button" class="clear-planner-btn" onclick="openClearConfirm()">
+        Clear all to shuffle a new meal planner
+      </button>
     </div>
   </section>
 
@@ -144,4 +138,30 @@
     </section>
   </div>
 </div>
+
+<div id="clearConfirmModal" class="confirm-modal">
+  <div class="confirm-box">
+    <p>Do you really want to clear your current meal planner?</p>
+
+    <div class="confirm-actions">
+      <a href="{{ url_for('meal_planner', action='clear_all') }}" class="confirm-yes">
+        Yes
+      </a>
+
+      <button type="button" class="confirm-no" onclick="closeClearConfirm()">
+        No
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openClearConfirm() {
+    document.getElementById("clearConfirmModal").style.display = "flex";
+  }
+
+  function closeClearConfirm() {
+    document.getElementById("clearConfirmModal").style.display = "none";
+  }
+</script>
 {% endblock %}
