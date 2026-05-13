@@ -31,10 +31,10 @@
         {% if following %}
           {% for user in following %}
           <li class="follow-item">
-            <div class="avatar">{{ user.initials|default('--') }}</div>
+            <div class="avatar">{{ user.display_name[:2].upper() }}</div>
             <div class="info">
-              <p class="uname">{{ user.username }}</p>
-              <p class="sub">{{ user.subtitle|default('') }}</p>
+              <p class="uname">{{ user.display_name }}</p>
+              <p class="sub">{{ user.username }}</p>
             </div>
             <button class="btn-sm-follow">Following</button>
           </li>
