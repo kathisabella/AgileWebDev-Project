@@ -13,6 +13,7 @@
 {% block content %}
 <div class="form-card">
   <form action="{{ url_for('edit_recipe', recipe_id=recipe_id|default(0)) }}" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <h1>Edit recipe</h1>
     <p class="sub">Update your recipe details here.</p>
 
