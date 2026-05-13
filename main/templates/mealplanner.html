@@ -35,7 +35,7 @@
 </div>
 
 <div class="planner-layout">
-  <section class="panel">
+  <section class="panel" id="meal-planner-table">
     <div class="panel-header">
       <div>
         <h3>Your own meal planner table</h3>
@@ -44,7 +44,7 @@
       
       <div class="planner-actions">
         {% if generated_days|length < 7 %}
-          <a href="{{ url_for('meal_planner', action='shuffle_day') }}" class="btn-solid">
+          <a href="{{ url_for('meal_planner', action='shuffle_day', count=generated_days|length, _anchor='meal-planner-table') }}" class="btn-solid">
             Shuffle one day
           </a>
         {% else %}
@@ -64,7 +64,7 @@
                     <span>Day {{ loop.index }}</span>
 
                     {% if day in generated_days %}
-                      <a href="{{ url_for('meal_planner', action='delete_day', day=day) }}"
+                      <a href="{{ url_for('meal_planner', action='delete_day', day=day, _anchor='meal-planner-table') }}"
                         class="delete-day-btn">
                         Delete
                       </a>
@@ -144,7 +144,7 @@
     <p>Do you really want to clear your current meal planner?</p>
 
     <div class="confirm-actions">
-      <a href="{{ url_for('meal_planner', action='clear_all') }}" class="confirm-yes">
+      <a href="{{ url_for('meal_planner', action='clear_all', _anchor='meal-planner-table') }}" class="confirm-yes">
         Yes
       </a>
 

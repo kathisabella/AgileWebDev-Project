@@ -90,9 +90,6 @@ def get_plan_stats(week_plan, saved_recipes):
 
 
 def get_meal_planner_context(days, meal_types, saved_recipes, user):
-    shuffle_type = request.args.get("shuffle")
-    shuffle_day = request.args.get("day")
-
     action = request.args.get("action")
     day_to_delete = request.args.get("day")
 
