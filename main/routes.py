@@ -353,6 +353,22 @@ def profile():
         .count()
     )
 
+    recipes = (
+        Recipe.query
+        .filter_by(author_id=user.id)
+        .order_by(Recipe.created_at.desc())
+        .all()
+    )
+
+    saved_recipes = [
+        item.recipe for item in (
+            SavedRecipe.query
+            .filter_by(user_id=user.id)
+            .order_by(SavedRecipe.saved_at.desc())
+            .all()
+        )
+    ]
+
     activities = (
         Activity.query
         .filter_by(user_id=user.id)
@@ -385,6 +401,8 @@ def profile():
         followers_count=followers_count,
         total_saves=total_saves,
         activity=activity_feed,
+        recipes=recipes,
+        saved_recipes=saved_recipes,
     )
 
 ## -------- Settings Page ---------------------------------------------
