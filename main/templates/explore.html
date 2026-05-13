@@ -42,10 +42,28 @@
     </div>
   </div>
 
-  <div>
-    <div class="recipe-grid">
-      <p class="empty-state">No recipes to display yet.</p>
-    </div>
+<div>
+  <div class="recipe-grid">
+    {% if recipes %}
+      {% for recipe in recipes %}
+      <div class="recipe-card">
+        <div class="recipe-thumb"></div>
+        <div class="recipe-body">
+          <p class="recipe-name">{{ recipe.title }}</p>
+          <p class="recipe-by">by {{ recipe.author.display_name }}</p>
+          <div class="recipe-meta">
+            <span class="tag">{{ recipe.cuisine }}</span>
+            <span>{{ recipe.difficulty }}</span>
+            <span>{{ recipe.prep_time }} min</span>
+          </div>
+          <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="empty-state">No recipes yet. Be the first to upload one!</p>
+    {% endif %}
   </div>
+</div>
 </div>
 {% endblock %}

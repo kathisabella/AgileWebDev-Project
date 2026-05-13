@@ -1,5 +1,6 @@
 from flask import render_template, request, redirect, url_for, session
 
+from main.forms import LoginForm, RegisterForm
 from main import app, db
 from main.mealplanner import get_meal_planner_context
 from main.models import (
@@ -49,7 +50,7 @@ def user_context(user=None):
 
 @app.route('/', methods=['GET'])
 def login_page():
-    return render_template('login.html')
+    return render_template('login.html', login_form=LoginForm(), signup_form=RegisterForm())
 
 ## -------- Login Page ---------------------------------------------
 @app.route("/login", methods=["POST"])
