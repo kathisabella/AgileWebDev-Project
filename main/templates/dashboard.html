@@ -117,7 +117,14 @@
         <a href="{{ url_for('following') }}">See all</a>
       </div>
       <ul class="follow-list">
-        <p class="empty-state">No suggested accounts yet.</p>
+        {% for u in followed_users %}
+        <li class="follow-item">
+          <span class="follow-name">{{ u.display_name }}</span>
+          <span class="follow-handle">@{{ u.username }}</span>
+        </li>
+        {% else %}
+        <p class="empty-state">You're not following anyone yet.</p>
+        {% endfor %}
       </ul>
     </section>
 

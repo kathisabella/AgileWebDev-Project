@@ -172,6 +172,16 @@ def dashboard():
     )
     top_recipes = [{"recipe": r, "save_count": count} for r, count in top_recipes_raw]
 
+    followed_users = [
+        f.following for f in (
+            Follow.query
+            .filter_by(follower_id=user.id)
+            .order_by(Follow.followed_at.desc())
+            .limit(5)
+            .all()
+        )
+    ]
+
     raw_activity = (
         Activity.query
         .filter_by(user_id=user.id)
@@ -201,6 +211,8 @@ def dashboard():
         top_recipes=top_recipes,
         activity_feed=activity_feed,
         tip=_daily_tip(),
+        followed_users=followed_users,
+        page_date=date.today().strftime("%A, %d %B %Y"),
     )
 
 ## -------- Explore Page ---------------------------------------------
