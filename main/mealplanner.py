@@ -121,8 +121,11 @@ def get_plan_stats(week_plan, saved_recipes):
             if recipe is not None:
                 meals_filled += 1
 
-                if quickest_recipe is None or recipe["time"] < quickest_recipe["time"]:
-                    quickest_recipe = recipe
+                recipe_time = recipe.get("time")
+
+                if isinstance(recipe_time, int):
+                    if quickest_recipe is None or recipe_time < quickest_recipe["time"]:
+                        quickest_recipe = recipe
     
     if quickest_recipe is None:
         quickest_meal = "No meals yet"
@@ -151,9 +154,9 @@ def get_shuffled_recipes(current_plan):
     return shuffled_recipes
 
 
-def get_meal_planner_context(days, meal_types, saved_recipes, user):
-    action = request.args.get("action")
-    day_to_delete = request.args.get("day")
+def get_meal_planner_context(days, meal_types, saved_recipes, user, action_override=None, day_override=None):
+    action = action_override or request.args.get("action")
+    day_to_delete = day_override or request.args.get("day")
 
     current_plan = load_user_meal_plan(user)
 

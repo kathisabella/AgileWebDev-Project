@@ -72,7 +72,6 @@ flask --app app db upgrade
 This will create `main/plateful.db`.
 
 ### 6. Seed demo data (optional)
-
 To populate the database with demo users and recipes:
 
 ```bash
