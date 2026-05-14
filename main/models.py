@@ -172,6 +172,7 @@ def create_test_data():
             "prep_time": 20,
             "servings": 2,
             "meal_type": "Dinner",
+            "image_url": "uploads/spaghetti.jpg",
             "description": "A classic Roman pasta — creamy without any cream. Just eggs, Pecorino, guanciale and pasta water.",
             "ingredients": [
                 "200g spaghetti",
@@ -199,6 +200,7 @@ def create_test_data():
             "prep_time": 45,
             "servings": 4,
             "meal_type": "Dinner",
+            "image_url": "uploads/chickentikkamasala.webp",
             "description": "Tender marinated chicken in a rich, spiced tomato cream sauce. Great with naan or basmati rice.",
             "ingredients": [
                 "700g chicken breast, cubed",
@@ -229,6 +231,7 @@ def create_test_data():
             "prep_time": 10,
             "servings": 1,
             "meal_type": "Breakfast",
+            "image_url": "uploads/avocadotoast.jpg",
             "description": "The classic done properly — creamy avocado, good bread, and the right toppings.",
             "ingredients": [
                 "2 slices sourdough bread",
@@ -254,6 +257,7 @@ def create_test_data():
             "prep_time": 30,
             "servings": 2,
             "meal_type": "Dinner",
+            "image_url": "uploads/pad_thai.jpg",
             "description": "Street-food style Pad Thai with the proper tangy-sweet-salty balance.",
             "ingredients": [
                 "200g flat rice noodles",
@@ -286,6 +290,7 @@ def create_test_data():
             "prep_time": 20,
             "servings": 2,
             "meal_type": "Breakfast",
+            "image_url": "uploads/banana_pancakes.jpg",
             "description": "Fluffy pancakes with ripe banana folded right into the batter. No syrup needed.",
             "ingredients": [
                 "2 ripe bananas",
@@ -313,6 +318,7 @@ def create_test_data():
             "prep_time": 15,
             "servings": 2,
             "meal_type": "Lunch",
+            "image_url": "uploads/greeksalad.png",
             "description": "The real thing — chunky vegetables, good olives, feta on top. No lettuce.",
             "ingredients": [
                 "3 tomatoes, cut into wedges",
@@ -340,6 +346,7 @@ def create_test_data():
             "prep_time": 50,
             "servings": 4,
             "meal_type": "Dinner",
+            "image_url": "uploads/butterchicken.jpg",
             "description": "Mildly spiced, velvety tomato-butter sauce with tender chicken. Perfect with naan.",
             "ingredients": [
                 "700g chicken thighs, cubed",
@@ -372,6 +379,7 @@ def create_test_data():
             "prep_time": 15,
             "servings": 2,
             "meal_type": "Breakfast",
+            "image_url": "uploads/misosoup.jpg",
             "description": "Light, warming miso broth with tofu and wakame. Done in 15 minutes.",
             "ingredients": [
                 "600ml dashi stock (or water)",
@@ -446,6 +454,7 @@ def create_test_data():
             servings=data["servings"],
             meal_type=data["meal_type"],
             description=data["description"],
+            image_url=data.get("image_url"),
         )
         db.session.add(r)
         db.session.flush()
