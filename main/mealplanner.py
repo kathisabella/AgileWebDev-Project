@@ -1,6 +1,8 @@
 import random
 from datetime import datetime
-from flask import request, session
+from flask import request
+from main import db
+from main.models import MealPlanEntry
 
 
 def get_recipes_for_meal(meal_type, saved_recipes):
@@ -34,36 +36,78 @@ def choose_recipe(meal_type, used_recipe_ids, saved_recipes):
     return selected_recipe
 
 
-def make_week_plan(days, meal_types, saved_recipes):
-    week_plan = {}
-    used_recipe_ids = []
-
-    for day in days:
-        week_plan[day] = {}
-
-        for meal_type in meal_types:
-            week_plan[day][meal_type] = choose_recipe(meal_type, used_recipe_ids, saved_recipes)
-
-    return week_plan
-
-
-def shuffle_single_day(current_plan, day, meal_types, saved_recipes):
+def make_one_day_plan(current_plan, meal_types, saved_recipes):
     used_recipe_ids = []
 
     for plan_day in current_plan:
-        if plan_day != day:
-            for meal_type in current_plan[plan_day]:
-                recipe = current_plan[plan_day][meal_type]
+        for meal_type in current_plan[plan_day]:
+            recipe = current_plan[plan_day][meal_type]
 
-                if recipe is not None:
-                    used_recipe_ids.append(recipe["id"])
+            if recipe is not None:
+                used_recipe_ids.append(recipe["id"])
 
-    current_plan[day] = {}
+    one_day_plan = {}
 
     for meal_type in meal_types:
-        current_plan[day][meal_type] = choose_recipe(meal_type, used_recipe_ids, saved_recipes)
+        one_day_plan[meal_type] = choose_recipe(meal_type, used_recipe_ids, saved_recipes)
 
-    return current_plan
+    return one_day_plan
+
+def delete_day_and_reorder(current_plan, day_to_delete):
+    if day_to_delete in current_plan:
+        current_plan.pop(day_to_delete)
+
+    old_day_plans = list(current_plan.values())
+    new_plan = {}
+
+    for index, day_plan in enumerate(old_day_plans, start=1):
+        new_plan[f"Day {index}"] = day_plan
+
+    return new_plan
+
+
+def load_user_meal_plan(user):
+    entries = MealPlanEntry.query.filter_by(user_id=user["id"]).order_by(MealPlanEntry.day).all()
+
+    meal_plan = {}
+
+    for entry in entries:
+        if entry.day not in meal_plan:
+            meal_plan[entry.day] = {}
+
+        if entry.recipe is None:
+            meal_plan[entry.day][entry.meal_type] = None
+        else:
+            meal_plan[entry.day][entry.meal_type] = {
+                "id": entry.recipe.id,
+                "name": entry.recipe.title,
+                "time": entry.recipe.prep_time,
+                "meal_type": entry.recipe.meal_type,
+                "tag": entry.recipe.cuisine
+            }
+
+    return meal_plan
+
+
+def save_user_meal_plan(user, meal_plan):
+    MealPlanEntry.query.filter_by(user_id=user["id"]).delete(synchronize_session=False)
+    db.session.flush()
+
+    for day in meal_plan:
+        for meal_type in meal_plan[day]:
+            recipe = meal_plan[day][meal_type]
+
+            entry = MealPlanEntry(
+                user_id=user["id"],
+                recipe_id=recipe["id"] if recipe else None,
+                day=day,
+                meal_type=meal_type,
+                week_start_date=datetime.now().date()
+            )
+
+            db.session.add(entry)
+
+    db.session.commit()
 
 
 def get_plan_stats(week_plan, saved_recipes):
@@ -89,25 +133,56 @@ def get_plan_stats(week_plan, saved_recipes):
         "saved_count": len(saved_recipes),
         "meals_filled": meals_filled,
         "quickest_meal": quickest_meal,
-        "planner_mode": "Weekly"
     }
 
 
+def get_shuffled_recipes(current_plan):
+    shuffled_recipes = []
+    used_recipe_ids = []
+
+    for day in current_plan:
+        for meal_type in current_plan[day]:
+            recipe = current_plan[day][meal_type]
+
+            if recipe is not None and recipe["id"] not in used_recipe_ids:
+                shuffled_recipes.append(recipe)
+                used_recipe_ids.append(recipe["id"])
+
+    return shuffled_recipes
+
+
 def get_meal_planner_context(days, meal_types, saved_recipes, user):
-    shuffle_type = request.args.get("shuffle")
-    shuffle_day = request.args.get("day")
+    action = request.args.get("action")
+    day_to_delete = request.args.get("day")
 
-    if "meal_plan" not in session:
-        session["meal_plan"] = make_week_plan(days, meal_types, saved_recipes)
+    current_plan = load_user_meal_plan(user)
 
-    if shuffle_type == "week":
-        session["meal_plan"] = make_week_plan(days, meal_types, saved_recipes)
+    if action == "shuffle_day":
+        if len(current_plan) < 7:
+            next_day = f"Day {len(current_plan) + 1}"
+            current_plan[next_day] = make_one_day_plan(current_plan, meal_types, saved_recipes)
+            save_user_meal_plan(user, current_plan)
 
-    elif shuffle_type == "day" and shuffle_day in days:
-        current_plan = session["meal_plan"]
-        session["meal_plan"] = shuffle_single_day(current_plan, shuffle_day, meal_types, saved_recipes)
+    elif action == "delete_day":
+        current_plan = delete_day_and_reorder(current_plan, day_to_delete)
+        save_user_meal_plan(user, current_plan)
 
-    stats = get_plan_stats(session["meal_plan"], saved_recipes)
+    elif action == "clear_all":
+        current_plan = {}
+        save_user_meal_plan(user, current_plan)
+
+    current_plan = load_user_meal_plan(user)
+
+    stats = get_plan_stats(current_plan, saved_recipes)
+
+    shuffled_recipes = get_shuffled_recipes(current_plan)
+
+    generated_days = list(current_plan.keys())
+
+    if len(generated_days) == 0:
+        display_days = ["Day 1"]
+    else:
+        display_days = generated_days
 
     return {
         "page_title": "Plateful Meal Planner",
@@ -117,8 +192,11 @@ def get_meal_planner_context(days, meal_types, saved_recipes, user):
         "display_name": user["display_name"],
         "username": user["username"],
         "days": days,
+        "display_days": display_days,
+        "generated_days": generated_days,
         "meal_types": meal_types,
-        "week_plan": session["meal_plan"],
+        "week_plan": current_plan,
         "saved_recipes": saved_recipes,
+        "shuffled_recipes": shuffled_recipes,
         "stats": stats
     }

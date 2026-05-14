@@ -16,7 +16,7 @@
     <div class="recipe-header">
       <h1>{{ recipe.title|default('Recipe title') }}</h1>
       <div class="recipe-meta">
-        {{ recipe.cuisine|default('Cuisine') }} · {{ recipe.prep_time|default('Time') }} · {{ recipe.difficulty|default('Difficulty') }} · by {{ recipe.author|default(username|default('@username')) }}
+        {{ recipe.cuisine|default('Cuisine') }} · {{ recipe.prep_time|default('Time') }} minutes · {{ recipe.difficulty|default('Difficulty') }} · by {{ recipe.author.display_name|default(username|default('@username')) }}
       </div>
     </div>
 

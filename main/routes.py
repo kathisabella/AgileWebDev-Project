@@ -40,6 +40,7 @@ def user_context(user=None):
         }
 
     return {
+        "id": user.id,
         "initials": user.display_name[:2].upper(),
         "display_name": user.display_name,
         "username": f"@{user.username}",
@@ -304,17 +305,15 @@ def meal_planner():
 
     user = get_current_user()
 
-    days = [
-        "Monday", "Tuesday", "Wednesday", "Thursday",
-        "Friday", "Saturday", "Sunday"
-    ]
-
     meal_types = ["Breakfast", "Lunch", "Dinner"]
+
+    days = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"]
 
     saved_items = SavedRecipe.query.filter_by(user_id=user.id).all()
 
     saved_recipes = [
         {
+            "id": saved.recipe.id,
             "name": saved.recipe.title,
             "meal_type": saved.recipe.meal_type or "Meal",
             "tag": saved.recipe.cuisine or "Recipe",

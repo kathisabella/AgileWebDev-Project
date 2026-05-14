@@ -17,14 +17,7 @@
 <div class="page-intro">
   <div>
     <h2>Meal planner</h2>
-    <p>Build your weekly planner from your saved recipes.</p>
-  </div>
-
-  <div class="planner-actions">
-    <a href="{{ url_for('meal_planner', shuffle='week') }}" class="btn-solid">Shuffle week</a>
-    {% if days %}
-      <a href="{{ url_for('meal_planner', shuffle='day', day=days[0]) }}" class="btn-soft">Shuffle one day</a>
-    {% endif %}
+    <p>Build your own meal planner from your saved recipes. Your meal planner table will be saved automatically.</p>
   </div>
 </div>
 
@@ -39,26 +32,25 @@
     <div class="value">{{ stats.meals_filled }}</div>
     <div class="hint"></div>
   </div>
-  <div class="summary-card">
-    <div class="label">Quickest meal</div>
-    <div class="value">{{ stats.quickest_meal }}</div>
-    <div class="hint"></div>
-  </div>
-  <div class="summary-card">
-    <div class="label">Planner mode</div>
-    <div class="value">{{ stats.planner_mode }}</div>
-    <div class="hint"></div>
-  </div>
 </div>
 
 <div class="planner-layout">
-  <section class="panel">
+  <section class="panel" id="meal-planner-table">
     <div class="panel-header">
       <div>
-        <h3>Weekly planner table</h3>
-        <p>Each cell is a saved recipe suggestion for that meal slot.</p>
+        <h3>Your own meal planner table</h3>
+        <p>Click "Shuffle one day" to add one day meal planner at a time. You can delete any day you do not want. Maximum 7 days.</p>
       </div>
-      <div class="meal-tag">{{ stats.planner_mode }}</div>
+      
+      <div class="planner-actions">
+        {% if generated_days|length < 7 %}
+          <a href="{{ url_for('meal_planner', action='shuffle_day', count=generated_days|length, _anchor='meal-planner-table') }}" class="btn-solid">
+            Shuffle one day
+          </a>
+        {% else %}
+          <button class="btn-solid" disabled>Maximum 7 days reached</button>
+        {% endif %}
+      </div>
     </div>
 
     <div class="week-table-wrap">
@@ -66,21 +58,36 @@
         <thead>
           <tr>
             <th>Meal</th>
-            {% for day in days %}
-              <th>{{ day }}</th>
-            {% endfor %}
+              {% for day in display_days %}
+                <th>
+                  <div class="day-header">
+                    <span>Day {{ loop.index }}</span>
+
+                    {% if day in generated_days %}
+                      <a href="{{ url_for('meal_planner', action='delete_day', day=day, t=range(1000000)|random, _anchor='meal-planner-table') }}"
+                        class="delete-day-btn">
+                        Delete
+                      </a>
+                    {% endif %}
+                  </div>
+                </th>
+              {% endfor %}
           </tr>
         </thead>
         <tbody>
           {% for meal_type in meal_types %}
           <tr>
             <td class="meal-label">{{ meal_type }}</td>
-            {% for day in days %}
+
+            {% for day in display_days %}
               <td class="meal-cell">
-                {% set recipe = week_plan[day][meal_type] %}
+                {% set recipe = week_plan.get(day, {}).get(meal_type) %}
+
                 {% if recipe %}
                   <div class="meal-card {{ meal_type|lower }}">
-                    <div class="meal-name">{{ recipe.name }}</div>
+                    <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="meal-name meal-link">
+                      {{ recipe.name }}
+                    </a>
                     <div class="meal-meta">
                       <span>{{ recipe.time }} mins</span>
                       <span>{{ recipe.meal_type }}</span>
@@ -88,7 +95,7 @@
                   </div>
                 {% else %}
                   <div class="meal-card {{ meal_type|lower }}">
-                    <p class="empty-table">No recipe available</p>
+                    <p class="empty-table">No meals yet</p>
                   </div>
                 {% endif %}
               </td>
@@ -98,11 +105,10 @@
         </tbody>
       </table>
     </div>
-
     <div class="legend">
-      {% for meal_type in meal_types %}
-        <span>{{ meal_type }}</span>
-      {% endfor %}
+      <button type="button" class="clear-planner-btn" onclick="openClearConfirm()">
+        Clear all to shuffle a new meal planner
+      </button>
     </div>
   </section>
 
@@ -110,18 +116,20 @@
     <section class="panel">
       <div class="panel-header">
         <div>
-          <h3>Saved recipes pool</h3>
-          <p>Examples of recipes the planner can draw from.</p>
+          <h3>Current shuffled recipes pool</h3>
+          <p>A list of recipes currently shuffled in the meal planner table.</p>
         </div>
       </div>
 
-      {% if saved_recipes %}
-        {% for recipe in saved_recipes %}
+      {% if shuffled_recipes %}
+        {% for recipe in shuffled_recipes %}
           <div class="mini-item">
             <div class="mini-left">
               <div class="mini-icon">🍽️</div>
               <div>
-                <div class="mini-name">{{ recipe.name }}</div>
+                <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="mini-name meal-link">
+                  {{ recipe.name }}
+                </a>
                 <div class="mini-sub">{{ recipe.meal_type }} · {{ recipe.tag }}</div>
               </div>
             </div>
@@ -129,9 +137,39 @@
           </div>
         {% endfor %}
       {% else %}
-        <div class="empty-note">No saved recipes yet.</div>
+        <div class="empty-note">No shuffled recipes yet.</div>
       {% endif %}
     </section>
   </div>
 </div>
+
+<div id="clearConfirmModal" class="confirm-modal">
+  <div class="confirm-box">
+    <p>Do you really want to clear your current meal planner?</p>
+
+    <div class="confirm-actions">
+      <button type="button" class="confirm-yes" onclick="confirmClearPlanner()">
+        Yes
+      </button>
+
+      <button type="button" class="confirm-no" onclick="closeClearConfirm()">
+        No
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openClearConfirm() {
+    document.getElementById("clearConfirmModal").style.display = "flex";
+  }
+
+  function closeClearConfirm() {
+    document.getElementById("clearConfirmModal").style.display = "none";
+  }
+
+  function confirmClearPlanner() {
+    window.location.href = "{{ url_for('meal_planner', action='clear_all') }}" + "&t=" + Date.now() + "#meal-planner-table";
+  }
+</script>
 {% endblock %}
