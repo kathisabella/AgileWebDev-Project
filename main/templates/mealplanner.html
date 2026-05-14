@@ -127,6 +127,10 @@
           <h3>Current shuffled recipes pool</h3>
           <p>A list of recipes currently shuffled in the meal planner table.</p>
         </div>
+
+        <span class="meal-tag">
+          {{ shuffled_recipes|length }} recipes
+        </span>
       </div>
 
       {% if shuffled_recipes %}
