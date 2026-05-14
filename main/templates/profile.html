@@ -177,7 +177,17 @@
               <p class="uname">{{ f.username }}</p>
               <p class="sub">{{ f.subtitle|default('') }}</p>
             </div>
-            <button class="btn-sm-follow">{{ 'Following' if f.is_following else 'Follow back' }}</button>
+            {% if f.is_following %}
+            <form method="POST" action="{{ url_for('unfollow_user', user_id=f.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <button type="submit" class="btn-sm-follow">Following</button>
+            </form>
+            {% else %}
+            <form method="POST" action="{{ url_for('follow_user', user_id=f.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <button type="submit" class="btn-sm-follow">Follow back</button>
+            </form>
+            {% endif %}
           </li>
           {% else %}
           <p class="empty-state">No followers yet.</p>
@@ -203,6 +213,10 @@
               <p class="uname">{{ f.username }}</p>
               <p class="sub">{{ f.subtitle|default('') }}</p>
             </div>
+            <form method="POST" action="{{ url_for('unfollow_user', user_id=f.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <button type="submit" class="btn-sm-follow">Following</button>
+            </form>
           </li>
           {% else %}
           <p class="empty-state">Not following anyone yet.</p>
