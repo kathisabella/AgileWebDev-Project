@@ -395,6 +395,17 @@ thead th:first-child { width: 98px; background: #f6f3e5; }
 }
 
 
+/* ─── link to each recipe details ─── */
+.meal-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.meal-link:hover {
+  text-decoration: underline;
+}
+
+
 /* ─── Clear all button at the botton of table ─── */
 .clear-planner-btn {
   border: 1px solid #d8d0b0;

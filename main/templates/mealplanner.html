@@ -85,7 +85,9 @@
 
                 {% if recipe %}
                   <div class="meal-card {{ meal_type|lower }}">
-                    <div class="meal-name">{{ recipe.name }}</div>
+                    <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="meal-name meal-link">
+                      {{ recipe.name }}
+                    </a>
                     <div class="meal-meta">
                       <span>{{ recipe.time }} mins</span>
                       <span>{{ recipe.meal_type }}</span>
@@ -125,7 +127,9 @@
             <div class="mini-left">
               <div class="mini-icon">🍽️</div>
               <div>
-                <div class="mini-name">{{ recipe.name }}</div>
+                <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="mini-name meal-link">
+                  {{ recipe.name }}
+                </a>
                 <div class="mini-sub">{{ recipe.meal_type }} · {{ recipe.tag }}</div>
               </div>
             </div>

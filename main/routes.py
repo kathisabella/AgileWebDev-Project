@@ -237,6 +237,7 @@ def meal_planner():
 
     saved_recipes = [
         {
+            "id": saved.recipe.id,
             "name": saved.recipe.title,
             "meal_type": saved.recipe.meal_type or "Meal",
             "tag": saved.recipe.cuisine or "Recipe",
@@ -556,3 +557,4 @@ def privacy():
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
+
