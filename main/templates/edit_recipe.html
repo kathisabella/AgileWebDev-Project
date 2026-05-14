@@ -114,11 +114,7 @@
     <div class="form-group">
       <label for="image">Recipe Image</label>
       {% if recipe.image_url %}
-<<<<<<< HEAD
-      <img class="image-preview" src="{{ url_for('static', filename=recipe.image_url) }}" alt="Current recipe photo"/>
-=======
       <img class="image-preview" src="{{ url_for('static', filename=recipe.image_url) }}" alt="Current recipe"/>
->>>>>>> 982815b (fixed edit_recipe.html, it was hardcoded as blank inputs.)
       {% else %}
       <div class="image-preview">🖼️</div>
       {% endif %}
