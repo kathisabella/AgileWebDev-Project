@@ -44,7 +44,7 @@
       
       <div class="planner-actions">
         {% if generated_days|length < 7 %}
-          <a href="{{ url_for('meal_planner', action='shuffle_day', count=generated_days|length, _anchor='meal-planner-table') }}" class="btn-solid">
+          <a href="{{ url_for('main.meal_planner', action='shuffle_day', count=generated_days|length, _anchor='meal-planner-table') }}" class="btn-solid">
             Shuffle one day
           </a>
         {% else %}
@@ -64,7 +64,7 @@
                     <span>Day {{ loop.index }}</span>
 
                     {% if day in generated_days %}
-                      <a href="{{ url_for('meal_planner', action='delete_day', day=day, t=range(1000000)|random, _anchor='meal-planner-table') }}"
+                      <a href="{{ url_for('main.meal_planner', action='delete_day', day=day, t=range(1000000)|random, _anchor='meal-planner-table') }}"
                         class="delete-day-btn">
                         Delete
                       </a>
@@ -85,7 +85,7 @@
 
                 {% if recipe %}
                   <div class="meal-card {{ meal_type|lower }}">
-                    <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="meal-name meal-link">
+                    <a href="{{ url_for('main.recipe_details', recipe_id=recipe.id) }}" class="meal-name meal-link">
                       {{ recipe.name }}
                     </a>
                     <div class="meal-meta">
@@ -127,7 +127,7 @@
             <div class="mini-left">
               <div class="mini-icon">🍽️</div>
               <div>
-                <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="mini-name meal-link">
+                <a href="{{ url_for('main.recipe_details', recipe_id=recipe.id) }}" class="mini-name meal-link">
                   {{ recipe.name }}
                 </a>
                 <div class="mini-sub">{{ recipe.meal_type }} · {{ recipe.tag }}</div>
@@ -169,7 +169,7 @@
   }
 
   function confirmClearPlanner() {
-    window.location.href = "{{ url_for('meal_planner', action='clear_all') }}" + "&t=" + Date.now() + "#meal-planner-table";
+    window.location.href = "{{ url_for('main.meal_planner', action='clear_all') }}" + "&t=" + Date.now() + "#meal-planner-table";
   }
 </script>
 {% endblock %}

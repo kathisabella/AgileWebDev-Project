@@ -26,9 +26,9 @@
   </div>
 
   <div class="actions" style="flex-direction: column;">
-    <a href="{{ url_for('dashboard') }}" class="btn save" style="text-align:center;">Go to Dashboard</a>
-    <a href="{{ url_for('explore') }}" class="btn" style="text-align:center;">Explore Recipes</a>
-    <a href="{{ url_for('login_page') }}" class="btn" style="text-align:center;">Back to Login</a>
+    <a href="{{ url_for('main.dashboard') }}" class="btn save" style="text-align:center;">Go to Dashboard</a>
+    <a href="{{ url_for('main.explore') }}" class="btn" style="text-align:center;">Explore Recipes</a>
+    <a href="{{ url_for('main.login_page') }}" class="btn" style="text-align:center;">Back to Login</a>
   </div>
 </div>
 {% endblock %}

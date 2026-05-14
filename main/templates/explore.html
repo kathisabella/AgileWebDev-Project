@@ -7,7 +7,7 @@
 <header class="topbar">
   <div>Explore Recipes</div>
   <div class="topbar-right">
-    <a class="btn-upload" href="{{ url_for('upload_recipe') }}">+ New Recipe</a>
+    <a class="btn-upload" href="{{ url_for('main.upload_recipe') }}">+ New Recipe</a>
   </div>
 </header>
 {% endblock %}
@@ -56,7 +56,7 @@
             <span>{{ recipe.difficulty }}</span>
             <span>{{ recipe.prep_time }} min</span>
           </div>
-          <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+          <a href="{{ url_for('main.recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
         </div>
       </div>
       {% endfor %}
