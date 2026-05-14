@@ -268,6 +268,7 @@ button, input, select { font: inherit; }
 
 body.page-meal-planner .content { overflow: auto; }
 body.page-meal-planner .wrapper { height: auto; min-height: 100vh; overflow: visible; }
+body.page-meal-planner .sidebar { position: sticky; top: 0; height: 100vh; }
 body.page-meal-planner .page-intro {
   display: flex;
   justify-content: space-between;
@@ -1120,6 +1121,7 @@ button, input, select { font: inherit; }
 ════════════════════════════════════════════ */
 
 body.page-meal-planner .wrapper { height: auto; min-height: 100vh; overflow: visible; }
+body.page-meal-planner .sidebar { position: sticky; top: 0; height: 100vh; }
 body.page-meal-planner .content { padding: 28px; }
 body.page-meal-planner .page-intro {
   display: flex;
