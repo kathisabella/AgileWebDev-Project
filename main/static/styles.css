@@ -656,6 +656,27 @@ body.page-saved .recipe-card:nth-child(8) .recipe-thumb { background: #fde8d8; }
 .empty-state p { font-family: var(--font-head); font-size: 1rem; font-style: italic; margin-bottom: 8px; color: var(--color-text); }
 .empty-state small { font-size: 0.82rem; }
 
+.recipe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.recipe-list .recipe-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.recipe-list .recipe-thumb {
+  width: 140px;
+  height: 100px;
+  flex-shrink: 0;
+}
+
+.recipe-list .recipe-body {
+  flex: 1;
+}
 
 /* ════════════════════════════════════════════
    PAGE: DASHBOARD
