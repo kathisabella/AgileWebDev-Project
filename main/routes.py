@@ -76,7 +76,7 @@ def login_page():
 
 ## -------- Login Page ---------------------------------------------
 @app.route("/login", methods=["POST"])
-@limiter.limit("10 per minute")
+@limiter.limit("3 per minute")
 def login():
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password", "")
@@ -96,7 +96,7 @@ def login():
 
 ## -------- Sign Up Page ---------------------------------------------
 @app.route("/signup", methods=["POST"])
-@limiter.limit("5 per minute")
+@limiter.limit("3 per minute")
 def signup():
     first_name = request.form.get("first_name", "").strip()
     last_name = request.form.get("last_name", "").strip()
