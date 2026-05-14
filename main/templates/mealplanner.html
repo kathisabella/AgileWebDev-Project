@@ -116,13 +116,13 @@
     <section class="panel">
       <div class="panel-header">
         <div>
-          <h3>Shuffled recipes pool</h3>
-          <p>Examples of recipes the planner can draw from.</p>
+          <h3>Current shuffled recipes pool</h3>
+          <p>A list of recipes currently shuffled in the meal planner table.</p>
         </div>
       </div>
 
-      {% if saved_recipes %}
-        {% for recipe in saved_recipes %}
+      {% if shuffled_recipes %}
+        {% for recipe in shuffled_recipes %}
           <div class="mini-item">
             <div class="mini-left">
               <div class="mini-icon">🍽️</div>

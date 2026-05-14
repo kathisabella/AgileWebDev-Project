@@ -136,6 +136,21 @@ def get_plan_stats(week_plan, saved_recipes):
     }
 
 
+def get_shuffled_recipes(current_plan):
+    shuffled_recipes = []
+    used_recipe_ids = []
+
+    for day in current_plan:
+        for meal_type in current_plan[day]:
+            recipe = current_plan[day][meal_type]
+
+            if recipe is not None and recipe["id"] not in used_recipe_ids:
+                shuffled_recipes.append(recipe)
+                used_recipe_ids.append(recipe["id"])
+
+    return shuffled_recipes
+
+
 def get_meal_planner_context(days, meal_types, saved_recipes, user):
     action = request.args.get("action")
     day_to_delete = request.args.get("day")
@@ -160,6 +175,8 @@ def get_meal_planner_context(days, meal_types, saved_recipes, user):
 
     stats = get_plan_stats(current_plan, saved_recipes)
 
+    shuffled_recipes = get_shuffled_recipes(current_plan)
+
     generated_days = list(current_plan.keys())
 
     if len(generated_days) == 0:
@@ -180,5 +197,6 @@ def get_meal_planner_context(days, meal_types, saved_recipes, user):
         "meal_types": meal_types,
         "week_plan": current_plan,
         "saved_recipes": saved_recipes,
+        "shuffled_recipes": shuffled_recipes,
         "stats": stats
     }
