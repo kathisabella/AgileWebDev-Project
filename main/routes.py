@@ -331,6 +331,99 @@ def meal_planner():
 
     return render_template("mealplanner.html", **context)
 
+@app.route("/meal-planner/shuffle-day", methods=["POST"])
+def meal_planner_shuffle_day():
+    redirect_response = login_required_redirect()
+    if redirect_response:
+        return redirect_response
+
+    user = get_current_user()
+
+    meal_types = ["Breakfast", "Lunch", "Dinner"]
+    days = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"]
+
+    saved_items = SavedRecipe.query.filter_by(user_id=user.id).all()
+
+    saved_recipes = [
+        {
+            "id": saved.recipe.id,
+            "name": saved.recipe.title,
+            "meal_type": saved.recipe.meal_type or "Meal",
+            "tag": saved.recipe.cuisine or "Recipe",
+            "time": saved.recipe.prep_time or 0,
+        }
+        for saved in saved_items
+    ]
+
+    get_meal_planner_context(
+        days,
+        meal_types,
+        saved_recipes,
+        user_context(user),
+        action_override="shuffle_day",
+    )
+
+    return redirect(url_for("meal_planner", _anchor="meal-planner-table"))
+
+
+@app.route("/meal-planner/delete-day", methods=["POST"])
+def meal_planner_delete_day():
+    redirect_response = login_required_redirect()
+    if redirect_response:
+        return redirect_response
+
+    user = get_current_user()
+    day = request.form.get("day")
+
+    meal_types = ["Breakfast", "Lunch", "Dinner"]
+    days = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"]
+
+    saved_items = SavedRecipe.query.filter_by(user_id=user.id).all()
+
+    saved_recipes = [
+        {
+            "id": saved.recipe.id,
+            "name": saved.recipe.title,
+            "meal_type": saved.recipe.meal_type or "Meal",
+            "tag": saved.recipe.cuisine or "Recipe",
+            "time": saved.recipe.prep_time or 0,
+        }
+        for saved in saved_items
+    ]
+
+    get_meal_planner_context(
+        days,
+        meal_types,
+        saved_recipes,
+        user_context(user),
+        action_override="delete_day",
+        day_override=day,
+    )
+
+    return redirect(url_for("meal_planner", _anchor="meal-planner-table"))
+
+
+@app.route("/meal-planner/clear-all", methods=["POST"])
+def meal_planner_clear_all():
+    redirect_response = login_required_redirect()
+    if redirect_response:
+        return redirect_response
+
+    user = get_current_user()
+
+    meal_types = ["Breakfast", "Lunch", "Dinner"]
+    days = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"]
+
+    get_meal_planner_context(
+        days,
+        meal_types,
+        [],
+        user_context(user),
+        action_override="clear_all",
+    )
+
+    return redirect(url_for("meal_planner", _anchor="meal-planner-table"))
+
 ## -------- Profile Page ---------------------------------------------
 @app.route("/profile", methods=["GET"])
 def profile():
