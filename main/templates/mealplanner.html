@@ -144,9 +144,9 @@
     <p>Do you really want to clear your current meal planner?</p>
 
     <div class="confirm-actions">
-      <a href="{{ url_for('meal_planner', action='clear_all', _anchor='meal-planner-table') }}" class="confirm-yes">
+      <button type="button" class="confirm-yes" onclick="confirmClearPlanner()">
         Yes
-      </a>
+      </button>
 
       <button type="button" class="confirm-no" onclick="closeClearConfirm()">
         No
@@ -162,6 +162,10 @@
 
   function closeClearConfirm() {
     document.getElementById("clearConfirmModal").style.display = "none";
+  }
+
+  function confirmClearPlanner() {
+    window.location.href = "{{ url_for('meal_planner', action='clear_all') }}" + "&t=" + Date.now() + "#meal-planner-table";
   }
 </script>
 {% endblock %}
