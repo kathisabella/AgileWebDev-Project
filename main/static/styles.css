@@ -1407,6 +1407,30 @@ body.page-saved .recipe-card:nth-child(8) .recipe-thumb { background: #fde8d8; }
 .empty-state p { font-family: var(--font-head); font-size: 1rem; font-style: italic; margin-bottom: 8px; color: var(--color-text); }
 .empty-state small { font-size: 0.82rem; }
 
+.recipe-actions {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-top: 12px;
+}
+
+.delete-form {
+  margin: 0;
+}
+
+.delete-btn {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.delete-btn:hover {
+  text-decoration: underline;
+}
 
 /* ════════════════════════════════════════════
    PAGE: DASHBOARD

@@ -63,7 +63,19 @@
         <span class="tag">{{ recipe.cuisine }}</span>
         <span>{{ recipe.prep_time }} min</span>
       </div>
-      <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+      <div class="recipe-actions">
+        <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+
+        <form
+          method="POST"
+          action="{{ url_for('unsave_recipe', recipe_id=recipe.id) }}"
+          class="delete-form"
+          onsubmit="return confirm('Delete this saved recipe?');"
+        >
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn delete-btn">Delete</button>
+        </form>
+      </div>
     </div>
   </div>
   {% else %}

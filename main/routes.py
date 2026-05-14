@@ -819,6 +819,25 @@ def save_recipe(recipe_id):
 
     return redirect(url_for("recipe_details", recipe_id=recipe.id))
 
+## -------- Delete Saved Recipe Page ---------------------------------------------
+@app.route("/recipe/<int:recipe_id>/unsave", methods=["POST"])
+def unsave_recipe(recipe_id):
+    redirect_response = login_required_redirect()
+    if redirect_response:
+        return redirect_response
+
+    user = get_current_user()
+
+    saved_recipe = SavedRecipe.query.filter_by(
+        user_id=user.id,
+        recipe_id=recipe_id,
+    ).first_or_404()
+
+    db.session.delete(saved_recipe)
+    db.session.commit()
+
+    return redirect(url_for("saved_recipes"))
+
 ## -------- Forgot Password Page ---------------------------------------------
 @app.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
