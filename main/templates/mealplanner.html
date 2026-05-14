@@ -44,12 +44,25 @@
       
       <div class="planner-actions">
         {% if generated_days|length < 7 %}
-          <form action="{{ url_for('meal_planner_shuffle_day') }}" method="post">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" class="btn-solid">
+          {% if stats.saved_count == 0 %}
+
+            <button type="button"
+                    class="btn-solid"
+                    onclick="openNoRecipesModal()">
               Shuffle one day
             </button>
-          </form>
+
+          {% else %}
+
+            <form action="{{ url_for('meal_planner_shuffle_day') }}" method="post">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+              <button type="submit" class="btn-solid">
+                Shuffle one day
+              </button>
+            </form>
+
+          {% endif %}
         {% else %}
           <button class="btn-solid btn-disabled" disabled>
             Maximum 7 days reached
@@ -155,6 +168,24 @@
   </div>
 </div>
 
+
+<div id="noRecipesModal" class="confirm-modal">
+  <div class="confirm-box">
+
+    <p>No saved recipes to shuffle.</p>
+
+    <div class="confirm-actions">
+      <button type="button"
+              class="confirm-yes"
+              onclick="closeNoRecipesModal()">
+        Yes
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
 <div id="clearConfirmModal" class="confirm-modal">
   <div class="confirm-box">
     <p>Do you really want to clear your current meal planner?</p>
@@ -175,6 +206,14 @@
 </div>
 
 <script>
+  function openNoRecipesModal() {
+    document.getElementById("noRecipesModal").style.display = "flex";
+  }
+
+  function closeNoRecipesModal() {
+    document.getElementById("noRecipesModal").style.display = "none";
+  }
+
   function openClearConfirm() {
     document.getElementById("clearConfirmModal").style.display = "flex";
   }
