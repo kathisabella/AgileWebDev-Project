@@ -90,7 +90,8 @@ def load_user_meal_plan(user):
 
 
 def save_user_meal_plan(user, meal_plan):
-    MealPlanEntry.query.filter_by(user_id=user["id"]).delete()
+    MealPlanEntry.query.filter_by(user_id=user["id"]).delete(synchronize_session=False)
+    db.session.flush()
 
     for day in meal_plan:
         for meal_type in meal_plan[day]:
@@ -154,6 +155,8 @@ def get_meal_planner_context(days, meal_types, saved_recipes, user):
     elif action == "clear_all":
         current_plan = {}
         save_user_meal_plan(user, current_plan)
+
+    current_plan = load_user_meal_plan(user)
 
     stats = get_plan_stats(current_plan, saved_recipes)
 

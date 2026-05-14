@@ -64,7 +64,7 @@
                     <span>Day {{ loop.index }}</span>
 
                     {% if day in generated_days %}
-                      <a href="{{ url_for('meal_planner', action='delete_day', day=day, _anchor='meal-planner-table') }}"
+                      <a href="{{ url_for('meal_planner', action='delete_day', day=day, t=range(1000000)|random, _anchor='meal-planner-table') }}"
                         class="delete-day-btn">
                         Delete
                       </a>
