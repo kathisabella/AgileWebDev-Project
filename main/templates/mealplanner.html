@@ -44,9 +44,12 @@
       
       <div class="planner-actions">
         {% if generated_days|length < 7 %}
-          <a href="{{ url_for('meal_planner', action='shuffle_day', count=generated_days|length, _anchor='meal-planner-table') }}" class="btn-solid">
-            Shuffle one day
-          </a>
+          <form action="{{ url_for('meal_planner_shuffle_day') }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn-solid">
+              Shuffle one day
+            </button>
+          </form>
         {% else %}
           <button class="btn-solid" disabled>Maximum 7 days reached</button>
         {% endif %}
@@ -64,10 +67,13 @@
                     <span>Day {{ loop.index }}</span>
 
                     {% if day in generated_days %}
-                      <a href="{{ url_for('meal_planner', action='delete_day', day=day, t=range(1000000)|random, _anchor='meal-planner-table') }}"
-                        class="delete-day-btn">
-                        Delete
-                      </a>
+                      <form action="{{ url_for('meal_planner_delete_day') }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="day" value="{{ day }}">
+                        <button type="submit" class="delete-day-btn">
+                          Delete
+                        </button>
+                      </form>
                     {% endif %}
                   </div>
                 </th>
@@ -148,9 +154,12 @@
     <p>Do you really want to clear your current meal planner?</p>
 
     <div class="confirm-actions">
-      <button type="button" class="confirm-yes" onclick="confirmClearPlanner()">
-        Yes
-      </button>
+      <form action="{{ url_for('meal_planner_clear_all') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="confirm-yes">
+          Yes
+        </button>
+      </form>
 
       <button type="button" class="confirm-no" onclick="closeClearConfirm()">
         No
@@ -166,10 +175,6 @@
 
   function closeClearConfirm() {
     document.getElementById("clearConfirmModal").style.display = "none";
-  }
-
-  function confirmClearPlanner() {
-    window.location.href = "{{ url_for('meal_planner', action='clear_all') }}" + "&t=" + Date.now() + "#meal-planner-table";
   }
 </script>
 {% endblock %}
