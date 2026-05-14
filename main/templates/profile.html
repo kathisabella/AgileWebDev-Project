@@ -83,7 +83,9 @@
   <div class="recipe-grid">
     {% for recipe in recipes %}
     <div class="recipe-card">
-      <div class="recipe-thumb"></div>
+      <div class="recipe-thumb">
+        {% if recipe.image_url %}<img src="{{ url_for('static', filename=recipe.image_url) }}" alt="{{ recipe.title }}"/>{% endif %}
+      </div>
       <div class="recipe-body">
         <p class="recipe-name">{{ recipe.title }}</p>
         <div class="recipe-meta">
@@ -108,7 +110,9 @@
   <div class="recipe-grid">
     {% for recipe in saved_recipes %}
     <div class="recipe-card">
-      <div class="recipe-thumb"></div>
+      <div class="recipe-thumb">
+        {% if recipe.image_url %}<img src="{{ url_for('static', filename=recipe.image_url) }}" alt="{{ recipe.title }}"/>{% endif %}
+      </div>
       <div class="recipe-body">
         <p class="recipe-name">{{ recipe.title }}</p>
         <p class="recipe-by">by {{ recipe.author.display_name }}</p>
