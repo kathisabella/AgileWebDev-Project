@@ -36,7 +36,9 @@
               <p class="uname">{{ user.display_name }}</p>
               <p class="sub">{{ user.username }}</p>
             </div>
-            <button class="btn-sm-follow">Following</button>
+            <form method="POST" action="{{ url_for('unfollow_user', user_id=user.id) }}">
+              <button type="submit" class="btn-sm-follow">Following</button>
+            </form>
           </li>
           {% endfor %}
         {% else %}

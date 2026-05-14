@@ -296,6 +296,37 @@ def following():
         following=following_users,
     )
 
+## -------- Follow / Unfollow ---------------------------------------------
+@app.route("/follow/<int:user_id>", methods=["POST"])
+def follow_user(user_id):
+    redirect_response = login_required_redirect()
+    if redirect_response:
+        return redirect_response
+
+    user = get_current_user()
+    if user.id != user_id:
+        already = Follow.query.filter_by(follower_id=user.id, following_id=user_id).first()
+        if not already:
+            db.session.add(Follow(follower_id=user.id, following_id=user_id))
+            db.session.commit()
+
+    return redirect(request.referrer or url_for("following"))
+
+
+@app.route("/unfollow/<int:user_id>", methods=["POST"])
+def unfollow_user(user_id):
+    redirect_response = login_required_redirect()
+    if redirect_response:
+        return redirect_response
+
+    user = get_current_user()
+    follow = Follow.query.filter_by(follower_id=user.id, following_id=user_id).first()
+    if follow:
+        db.session.delete(follow)
+        db.session.commit()
+
+    return redirect(request.referrer or url_for("following"))
+
 ## -------- Meal Planner Page ---------------------------------------------
 @app.route("/meal-planner", methods=["GET"])
 def meal_planner():
@@ -342,8 +373,34 @@ def profile():
 
     recipe_count = Recipe.query.filter_by(author_id=user.id).count()
     saved_count = SavedRecipe.query.filter_by(user_id=user.id).count()
-    following_count = Follow.query.filter_by(follower_id=user.id).count()
-    followers_count = Follow.query.filter_by(following_id=user.id).count()
+
+    following_rows = Follow.query.filter_by(follower_id=user.id).all()
+    followers_rows = Follow.query.filter_by(following_id=user.id).all()
+    following_count = len(following_rows)
+    followers_count = len(followers_rows)
+
+    following_id_set = {row.following_id for row in following_rows}
+
+    followers_list = [
+        {
+            "id": row.follower.id,
+            "username": row.follower.username,
+            "display_name": row.follower.display_name,
+            "initials": row.follower.display_name[:2].upper(),
+            "is_following": row.follower_id in following_id_set,
+        }
+        for row in followers_rows
+    ]
+
+    following_list = [
+        {
+            "id": row.following.id,
+            "username": row.following.username,
+            "display_name": row.following.display_name,
+            "initials": row.following.display_name[:2].upper(),
+        }
+        for row in following_rows
+    ]
 
     total_saves = (
         db.session.query(SavedRecipe)
@@ -398,6 +455,8 @@ def profile():
         saved_count=saved_count,
         following_count=following_count,
         followers_count=followers_count,
+        followers=followers_list,
+        following_users=following_list,
         total_saves=total_saves,
         activity=activity_feed,
         recipes=recipes,
