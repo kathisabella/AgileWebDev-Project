@@ -50,6 +50,21 @@
 </div>
 
 <div class="recipe-grid">
+  {% for recipe in recipes %}
+  <div class="recipe-card">
+    <div class="recipe-thumb"></div>
+    <div class="recipe-body">
+      <p class="recipe-name">{{ recipe.title }}</p>
+      <p class="recipe-by">by {{ recipe.author.display_name }}</p>
+      <div class="recipe-meta">
+        <span class="tag">{{ recipe.cuisine }}</span>
+        <span>{{ recipe.prep_time }} min</span>
+      </div>
+      <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+    </div>
+  </div>
+  {% else %}
   <p class="empty-state">No saved recipes yet.</p>
+  {% endfor %}
 </div>
 {% endblock %}

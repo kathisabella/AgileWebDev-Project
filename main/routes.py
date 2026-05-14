@@ -1,16 +1,18 @@
+from datetime import date
 from flask import render_template, request, redirect, url_for, session
+from sqlalchemy import func
 
 from main.forms import LoginForm, RegisterForm
 from main import app, db
 from main.mealplanner import get_meal_planner_context
 from main.models import (
-    User, 
-    Recipe, 
-    Ingredient, 
-    RecipeStep, 
-    SavedRecipe, 
+    User,
+    Recipe,
+    Ingredient,
+    RecipeStep,
+    SavedRecipe,
     Follow,
-    Activity,   
+    Activity,
 )
 
 def get_current_user():
@@ -109,6 +111,26 @@ def signup():
 
     return redirect(url_for("dashboard"))
 
+_TIPS = [
+    "Salt your pasta water until it tastes like the sea — it's your only chance to season the pasta itself.",
+    "Pat meat dry before searing. Moisture is the enemy of a good crust.",
+    "Taste as you go. Seasoning at the end can't fix under-seasoned layers.",
+    "Rest your meat after cooking — 5 minutes makes a big difference in juiciness.",
+    "Cold butter whisked into a sauce at the end gives it a glossy, restaurant finish.",
+    "Toast your spices in a dry pan before grinding to unlock deeper flavour.",
+    "Acid (lemon, vinegar) added at the end brightens a dish that tastes flat.",
+    "Use the pasta cooking water to loosen and bind your sauce — the starch is key.",
+    "Room-temperature eggs and dairy incorporate more evenly into batters.",
+    "A pinch of sugar balances acidic tomato sauces without making them sweet.",
+    "Slice meat against the grain to shorten muscle fibres and make it more tender.",
+    "Fresh herbs go in at the end; dried herbs go in early so they have time to bloom.",
+]
+
+
+def _daily_tip():
+    return _TIPS[date.today().timetuple().tm_yday % len(_TIPS)]
+
+
 ## -------- Dashboard ---------------------------------------------
 @app.route("/dashboard", methods=["GET"])
 def dashboard():
@@ -129,6 +151,54 @@ def dashboard():
         .count()
     )
 
+    recent_saved = [
+        item.recipe for item in (
+            SavedRecipe.query
+            .filter_by(user_id=user.id)
+            .order_by(SavedRecipe.saved_at.desc())
+            .limit(3)
+            .all()
+        )
+    ]
+
+    top_recipes_raw = (
+        db.session.query(Recipe, func.count(SavedRecipe.id).label("save_count"))
+        .outerjoin(SavedRecipe, SavedRecipe.recipe_id == Recipe.id)
+        .filter(Recipe.author_id == user.id)
+        .group_by(Recipe.id)
+        .order_by(func.count(SavedRecipe.id).desc())
+        .limit(5)
+        .all()
+    )
+    top_recipes = [{"recipe": r, "save_count": count} for r, count in top_recipes_raw]
+
+    followed_users = [
+        f.following for f in (
+            Follow.query
+            .filter_by(follower_id=user.id)
+            .order_by(Follow.followed_at.desc())
+            .limit(5)
+            .all()
+        )
+    ]
+
+    raw_activity = (
+        Activity.query
+        .filter_by(user_id=user.id)
+        .order_by(Activity.created_at.desc())
+        .limit(5)
+        .all()
+    )
+    activity_feed = []
+    for item in raw_activity:
+        if item.activity_type == "uploaded_recipe" and item.related_recipe:
+            text = f"Uploaded recipe: {item.related_recipe.title}"
+        elif item.activity_type == "saved_recipe" and item.related_recipe:
+            text = f"Saved recipe: {item.related_recipe.title}"
+        else:
+            text = item.activity_type
+        activity_feed.append({"text": text, "time": item.created_at.strftime("%d %b %Y")})
+
     return render_template(
         "dashboard.html",
         **user_context(user),
@@ -137,6 +207,12 @@ def dashboard():
         saved_count=saved_count,
         following_count=following_count,
         total_saves=total_saves,
+        recent_saved=recent_saved,
+        top_recipes=top_recipes,
+        activity_feed=activity_feed,
+        tip=_daily_tip(),
+        followed_users=followed_users,
+        page_date=date.today().strftime("%A, %d %B %Y"),
     )
 
 ## -------- Explore Page ---------------------------------------------
@@ -277,6 +353,22 @@ def profile():
         .count()
     )
 
+    recipes = (
+        Recipe.query
+        .filter_by(author_id=user.id)
+        .order_by(Recipe.created_at.desc())
+        .all()
+    )
+
+    saved_recipes = [
+        item.recipe for item in (
+            SavedRecipe.query
+            .filter_by(user_id=user.id)
+            .order_by(SavedRecipe.saved_at.desc())
+            .all()
+        )
+    ]
+
     activities = (
         Activity.query
         .filter_by(user_id=user.id)
@@ -309,6 +401,8 @@ def profile():
         followers_count=followers_count,
         total_saves=total_saves,
         activity=activity_feed,
+        recipes=recipes,
+        saved_recipes=saved_recipes,
     )
 
 ## -------- Settings Page ---------------------------------------------
