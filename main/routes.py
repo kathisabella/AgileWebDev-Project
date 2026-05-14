@@ -3,7 +3,8 @@ from flask import render_template, request, redirect, url_for, session
 from sqlalchemy import func
 
 from main.forms import LoginForm, RegisterForm
-from main import app, db
+from main import db
+from main.blueprints import main
 from main.mealplanner import get_meal_planner_context
 from main.models import (
     User,
@@ -24,7 +25,7 @@ def get_current_user():
 
 def login_required_redirect():
     if not session.get("user_id"):
-        return redirect(url_for("login_page"))
+        return redirect(url_for("main.login_page"))
     return None
 
 
@@ -51,12 +52,12 @@ def user_context(user=None):
 
 
 
-@app.route('/', methods=['GET'])
+@main.route('/', methods=['GET'])
 def login_page():
     return render_template('login.html', login_form=LoginForm(), signup_form=RegisterForm())
 
 ## -------- Login Page ---------------------------------------------
-@app.route("/login", methods=["POST"])
+@main.route("/login", methods=["POST"])
 def login():
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password", "")
@@ -64,17 +65,17 @@ def login():
     user = User.query.filter_by(email=email).first()
 
     if user is None or not user.check_password(password):
-        return redirect(url_for("login_page"))
+        return redirect(url_for("main.login_page"))
 
     session["user_id"] = user.id
     session["username"] = user.username
     session["display_name"] = user.display_name
     session["initials"] = user.display_name[:2].upper()
 
-    return redirect(url_for("dashboard"))
+    return redirect(url_for("main.dashboard"))
 
 ## -------- Sign Up Page ---------------------------------------------
-@app.route("/signup", methods=["POST"])
+@main.route("/signup", methods=["POST"])
 def signup():
     first_name = request.form.get("first_name", "").strip()
     last_name = request.form.get("last_name", "").strip()
@@ -84,14 +85,14 @@ def signup():
     accept_terms = request.form.get("accept_terms")
 
     if not username or not email or not password or not accept_terms:
-        return redirect(url_for("login_page"))
+        return redirect(url_for("main.login_page"))
 
     existing_user = User.query.filter(
         (User.username == username) | (User.email == email)
     ).first()
 
     if existing_user:
-        return redirect(url_for("login_page"))
+        return redirect(url_for("main.login_page"))
 
     display_name = f"{first_name} {last_name}".strip() or username
 
@@ -110,7 +111,7 @@ def signup():
     session["display_name"] = new_user.display_name
     session["initials"] = new_user.display_name[:2].upper()
 
-    return redirect(url_for("dashboard"))
+    return redirect(url_for("main.dashboard"))
 
 _TIPS = [
     "Salt your pasta water until it tastes like the sea — it's your only chance to season the pasta itself.",
@@ -133,7 +134,7 @@ def _daily_tip():
 
 
 ## -------- Dashboard ---------------------------------------------
-@app.route("/dashboard", methods=["GET"])
+@main.route("/dashboard", methods=["GET"])
 def dashboard():
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -198,7 +199,7 @@ def dashboard():
             text = f"Saved recipe: {item.related_recipe.title}"
         else:
             text = item.activity_type
-        activity_feed.append({"text": text, "time": item.created_at.strftime("%d %b %Y")})
+        activity_feed.mainend({"text": text, "time": item.created_at.strftime("%d %b %Y")})
 
     return render_template(
         "dashboard.html",
@@ -217,7 +218,7 @@ def dashboard():
     )
 
 ## -------- Explore Page ---------------------------------------------
-@app.route("/explore", methods=["GET"])
+@main.route("/explore", methods=["GET"])
 def explore():
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -232,7 +233,7 @@ def explore():
     )
 
 ## -------- My Recipes Page ---------------------------------------------
-@app.route("/my-recipes", methods=["GET"])
+@main.route("/my-recipes", methods=["GET"])
 def my_recipes():
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -248,7 +249,7 @@ def my_recipes():
     )
 
 ## -------- Save Recipes Page ---------------------------------------------
-@app.route("/saved", methods=["GET"])
+@main.route("/saved", methods=["GET"])
 def saved_recipes():
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -273,13 +274,13 @@ def saved_recipes():
     )
 
 ## -------- Log Out Page ---------------------------------------------
-@app.route("/logout", methods=["POST"])
+@main.route("/logout", methods=["POST"])
 def logout():
     session.clear()
-    return redirect(url_for("login_page"))
+    return redirect(url_for("main.login_page"))
 
 ## -------- Following Page ---------------------------------------------
-@app.route("/following", methods=["GET"])
+@main.route("/following", methods=["GET"])
 def following():
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -297,7 +298,7 @@ def following():
     )
 
 ## -------- Meal Planner Page ---------------------------------------------
-@app.route("/meal-planner", methods=["GET"])
+@main.route("/meal-planner", methods=["GET"])
 def meal_planner():
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -332,7 +333,7 @@ def meal_planner():
     return render_template("mealplanner.html", **context)
 
 ## -------- Profile Page ---------------------------------------------
-@app.route("/profile", methods=["GET"])
+@main.route("/profile", methods=["GET"])
 def profile():
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -386,7 +387,7 @@ def profile():
         else:
             text = item.activity_type
 
-        activity_feed.append({
+        activity_feed.mainend({
             "text": text,
             "time": item.created_at.strftime("%d %b %Y")
         })
@@ -405,7 +406,7 @@ def profile():
     )
 
 ## -------- Settings Page ---------------------------------------------
-@app.route("/settings", methods=["GET", "POST"])
+@main.route("/settings", methods=["GET", "POST"])
 def settings():
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -431,12 +432,12 @@ def settings():
         session["display_name"] = user.display_name
         session["initials"] = user.display_name[:2].upper()
 
-        return redirect(url_for("profile"))
+        return redirect(url_for("main.profile"))
 
     return render_template("settings.html", **user_context(user))
 
 ## -------- Upload Recipe Page ---------------------------------------------
-@app.route("/upload", methods=["GET", "POST"])
+@main.route("/upload", methods=["GET", "POST"])
 def upload_recipe():
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -453,7 +454,7 @@ def upload_recipe():
         description = request.form.get("description", "").strip()
 
         if not title:
-            return redirect(url_for("upload_recipe"))
+            return redirect(url_for("main.upload_recipe"))
 
         recipe = Recipe(
             author_id=user.id,
@@ -501,12 +502,12 @@ def upload_recipe():
 
         db.session.commit()
 
-        return redirect(url_for("recipe_details", recipe_id=recipe.id))
+        return redirect(url_for("main.recipe_details", recipe_id=recipe.id))
 
     return render_template("upload_recipe.html", **user_context(user))
 
 ## -------- Recipe Details Page ---------------------------------------------
-@app.route("/recipe/<int:recipe_id>", methods=["GET"])
+@main.route("/recipe/<int:recipe_id>", methods=["GET"])
 def recipe_details(recipe_id):
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -522,7 +523,7 @@ def recipe_details(recipe_id):
     )
 
 ## -------- Edit Recipe Page ---------------------------------------------
-@app.route("/recipe/<int:recipe_id>/edit", methods=["GET", "POST"])
+@main.route("/recipe/<int:recipe_id>/edit", methods=["GET", "POST"])
 def edit_recipe(recipe_id):
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -532,7 +533,7 @@ def edit_recipe(recipe_id):
     recipe = Recipe.query.get_or_404(recipe_id)
 
     if recipe.author_id != user.id:
-        return redirect(url_for("dashboard"))
+        return redirect(url_for("main.dashboard"))
 
     if request.method == "POST":
         recipe.title = request.form.get("title", "").strip() or recipe.title
@@ -568,7 +569,7 @@ def edit_recipe(recipe_id):
                 )
 
         db.session.commit()
-        return redirect(url_for("recipe_details", recipe_id=recipe.id))
+        return redirect(url_for("main.recipe_details", recipe_id=recipe.id))
 
     return render_template(
         "edit_recipe.html",
@@ -578,7 +579,7 @@ def edit_recipe(recipe_id):
     )
 
 ## -------- Delete Recipe Page ---------------------------------------------
-@app.route("/recipe/<int:recipe_id>/delete", methods=["POST"])
+@main.route("/recipe/<int:recipe_id>/delete", methods=["POST"])
 def delete_recipe(recipe_id):
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -588,15 +589,15 @@ def delete_recipe(recipe_id):
     recipe = Recipe.query.get_or_404(recipe_id)
 
     if recipe.author_id != user.id:
-        return redirect(url_for("dashboard"))
+        return redirect(url_for("main.dashboard"))
 
     db.session.delete(recipe)
     db.session.commit()
 
-    return redirect(url_for("my_recipes"))
+    return redirect(url_for("main.my_recipes"))
 
 ## -------- Save Recipe Page ---------------------------------------------
-@app.route("/recipe/<int:recipe_id>/save", methods=["POST"])
+@main.route("/recipe/<int:recipe_id>/save", methods=["POST"])
 def save_recipe(recipe_id):
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -628,26 +629,26 @@ def save_recipe(recipe_id):
 
         db.session.commit()
 
-    return redirect(url_for("recipe_details", recipe_id=recipe.id))
+    return redirect(url_for("main.recipe_details", recipe_id=recipe.id))
 
 ## -------- Forgot Password Page ---------------------------------------------
-@app.route("/forgot-password", methods=["GET", "POST"])
+@main.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
     if request.method == "POST":
-        return redirect(url_for("login_page"))
+        return redirect(url_for("main.login_page"))
     return render_template("forgot_password.html")
 
 ## -------- Terms & Conditions Page ---------------------------------------------
-@app.route('/terms', methods=['GET'])
+@main.route('/terms', methods=['GET'])
 def terms():
     return render_template('terms.html')
 
 ## -------- Privacy Page ---------------------------------------------
-@app.route('/privacy', methods=['GET'])
+@main.route('/privacy', methods=['GET'])
 def privacy():
     return render_template('privacy.html')
 
 ## -------- 404 Error Handling Page ---------------------------------------------
-@app.errorhandler(404)
+@main.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
