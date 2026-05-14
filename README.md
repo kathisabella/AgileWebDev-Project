@@ -82,6 +82,11 @@ flask shell
 >>> from main.models import create_test_data
 >>> create_test_data()
 ```
+Exit shell:
+```python
+>>> exit()
+```
+
 
 Demo accounts created:
 
