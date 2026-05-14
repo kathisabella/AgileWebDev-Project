@@ -724,6 +724,7 @@ body.page-login { display: flex; min-height: 100vh; }
 
 .panel-right { flex: 1; display: flex; align-items: center; justify-content: center; padding: 48px 32px; }
 .form-box { width: 100%; max-width: 400px; }
+.form-error { font-size: 0.82rem; color: #b94a48; background: #fdf2f2; border: 1px solid #f5c6c6; border-radius: 7px; padding: 8px 12px; margin-bottom: 14px; }
 
 .tabs { display: flex; background: var(--color-surface); border: 1px solid #d8d0b0; border-radius: 10px; padding: 4px; margin-bottom: 32px; }
 .tab-btn { flex: 1; padding: 9px; border: none; background: none; border-radius: 7px; font-family: var(--font-ui); font-size: 0.875rem; font-weight: 600; color: var(--color-muted); cursor: pointer; transition: background 0.15s, color 0.15s; }

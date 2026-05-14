@@ -1,5 +1,5 @@
 from datetime import date
-from flask import render_template, request, redirect, url_for, session
+from flask import render_template, request, redirect, url_for, session, flash
 from sqlalchemy import func
 
 from main.forms import LoginForm, RegisterForm
@@ -53,7 +53,8 @@ def user_context(user=None):
 
 @app.route('/', methods=['GET'])
 def login_page():
-    return render_template('login.html', login_form=LoginForm(), signup_form=RegisterForm())
+    active_tab = request.args.get("tab", "login")
+    return render_template('login.html', login_form=LoginForm(), signup_form=RegisterForm(), active_tab=active_tab)
 
 ## -------- Login Page ---------------------------------------------
 @app.route("/login", methods=["POST"])
@@ -64,6 +65,7 @@ def login():
     user = User.query.filter_by(email=email).first()
 
     if user is None or not user.check_password(password):
+        flash("Invalid email or password.", "login_error")
         return redirect(url_for("login_page"))
 
     session["user_id"] = user.id
@@ -84,14 +86,19 @@ def signup():
     accept_terms = request.form.get("accept_terms")
 
     if not username or not email or not password or not accept_terms:
-        return redirect(url_for("login_page"))
+        flash("Please fill in all required fields and accept the terms.", "signup_error")
+        return redirect(url_for("login_page", tab="signup"))
 
     existing_user = User.query.filter(
         (User.username == username) | (User.email == email)
     ).first()
 
     if existing_user:
-        return redirect(url_for("login_page"))
+        if User.query.filter_by(username=username).first():
+            flash("That username is already taken.", "signup_error")
+        else:
+            flash("An account with that email already exists.", "signup_error")
+        return redirect(url_for("login_page", tab="signup"))
 
     display_name = f"{first_name} {last_name}".strip() or username
 
@@ -296,6 +303,37 @@ def following():
         following=following_users,
     )
 
+## -------- Follow / Unfollow ---------------------------------------------
+@app.route("/follow/<int:user_id>", methods=["POST"])
+def follow_user(user_id):
+    redirect_response = login_required_redirect()
+    if redirect_response:
+        return redirect_response
+
+    user = get_current_user()
+    if user.id != user_id:
+        already = Follow.query.filter_by(follower_id=user.id, following_id=user_id).first()
+        if not already:
+            db.session.add(Follow(follower_id=user.id, following_id=user_id))
+            db.session.commit()
+
+    return redirect(request.referrer or url_for("following"))
+
+
+@app.route("/unfollow/<int:user_id>", methods=["POST"])
+def unfollow_user(user_id):
+    redirect_response = login_required_redirect()
+    if redirect_response:
+        return redirect_response
+
+    user = get_current_user()
+    follow = Follow.query.filter_by(follower_id=user.id, following_id=user_id).first()
+    if follow:
+        db.session.delete(follow)
+        db.session.commit()
+
+    return redirect(request.referrer or url_for("following"))
+
 ## -------- Meal Planner Page ---------------------------------------------
 @app.route("/meal-planner", methods=["GET"])
 def meal_planner():
@@ -342,8 +380,34 @@ def profile():
 
     recipe_count = Recipe.query.filter_by(author_id=user.id).count()
     saved_count = SavedRecipe.query.filter_by(user_id=user.id).count()
-    following_count = Follow.query.filter_by(follower_id=user.id).count()
-    followers_count = Follow.query.filter_by(following_id=user.id).count()
+
+    following_rows = Follow.query.filter_by(follower_id=user.id).all()
+    followers_rows = Follow.query.filter_by(following_id=user.id).all()
+    following_count = len(following_rows)
+    followers_count = len(followers_rows)
+
+    following_id_set = {row.following_id for row in following_rows}
+
+    followers_list = [
+        {
+            "id": row.follower.id,
+            "username": row.follower.username,
+            "display_name": row.follower.display_name,
+            "initials": row.follower.display_name[:2].upper(),
+            "is_following": row.follower_id in following_id_set,
+        }
+        for row in followers_rows
+    ]
+
+    following_list = [
+        {
+            "id": row.following.id,
+            "username": row.following.username,
+            "display_name": row.following.display_name,
+            "initials": row.following.display_name[:2].upper(),
+        }
+        for row in following_rows
+    ]
 
     total_saves = (
         db.session.query(SavedRecipe)
@@ -398,6 +462,8 @@ def profile():
         saved_count=saved_count,
         following_count=following_count,
         followers_count=followers_count,
+        followers=followers_list,
+        following_users=following_list,
         total_saves=total_saves,
         activity=activity_feed,
         recipes=recipes,
@@ -448,6 +514,7 @@ def upload_recipe():
         title = request.form.get("title", "").strip()
         cuisine = request.form.get("cuisine", "").strip()
         difficulty = request.form.get("difficulty", "").strip()
+        meal_type = request.form.get("meal_type", "").strip()
         prep_time = request.form.get("prep_time", "").strip()
         servings = request.form.get("servings", "").strip()
         description = request.form.get("description", "").strip()
@@ -460,6 +527,7 @@ def upload_recipe():
             title=title,
             cuisine=cuisine,
             difficulty=difficulty,
+            meal_type=meal_type or None,
             prep_time=int(prep_time) if prep_time.isdigit() else None,
             servings=int(servings) if servings.isdigit() else None,
             description=description,
@@ -538,6 +606,7 @@ def edit_recipe(recipe_id):
         recipe.title = request.form.get("title", "").strip() or recipe.title
         recipe.cuisine = request.form.get("cuisine", "").strip()
         recipe.difficulty = request.form.get("difficulty", "").strip()
+        recipe.meal_type = request.form.get("meal_type", "").strip() or None
         recipe.description = request.form.get("description", "").strip()
 
         prep_time = request.form.get("prep_time", "").strip()
