@@ -99,7 +99,11 @@
 
     <div class="form-group">
       <label for="image">Recipe Image</label>
+      {% if recipe.image_url %}
+      <img class="image-preview" src="{{ url_for('static', filename=recipe.image_url) }}" alt="Current recipe photo"/>
+      {% else %}
       <div class="image-preview">🖼️</div>
+      {% endif %}
       <input type="file" id="image" name="image"/>
     </div>
 

@@ -1,6 +1,9 @@
+import os
+import uuid
 from datetime import date
 from flask import render_template, request, redirect, url_for, session, flash
 from sqlalchemy import func
+from werkzeug.utils import secure_filename
 
 from main.forms import LoginForm, RegisterForm
 from main import app, db
@@ -14,6 +17,21 @@ from main.models import (
     Follow,
     Activity,
 )
+
+_ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+_UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "static", "uploads")
+
+def _save_image(file):
+    """Save an uploaded file to static/uploads and return the URL path, or None."""
+    if not file or not file.filename:
+        return None
+    ext = file.filename.rsplit(".", 1)[-1].lower()
+    if ext not in _ALLOWED_EXTENSIONS:
+        return None
+    filename = f"{uuid.uuid4().hex}.{ext}"
+    file.save(os.path.join(_UPLOAD_FOLDER, filename))
+    return f"uploads/{filename}"
+
 
 def get_current_user():
     user_id = session.get("user_id")
@@ -522,6 +540,8 @@ def upload_recipe():
         if not title:
             return redirect(url_for("upload_recipe"))
 
+        image_url = _save_image(request.files.get("image"))
+
         recipe = Recipe(
             author_id=user.id,
             title=title,
@@ -531,6 +551,7 @@ def upload_recipe():
             prep_time=int(prep_time) if prep_time.isdigit() else None,
             servings=int(servings) if servings.isdigit() else None,
             description=description,
+            image_url=image_url,
         )
 
         db.session.add(recipe)
@@ -608,6 +629,10 @@ def edit_recipe(recipe_id):
         recipe.difficulty = request.form.get("difficulty", "").strip()
         recipe.meal_type = request.form.get("meal_type", "").strip() or None
         recipe.description = request.form.get("description", "").strip()
+
+        new_image = _save_image(request.files.get("image"))
+        if new_image:
+            recipe.image_url = new_image
 
         prep_time = request.form.get("prep_time", "").strip()
         servings = request.form.get("servings", "").strip()

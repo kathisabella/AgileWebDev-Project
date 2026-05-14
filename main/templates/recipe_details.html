@@ -28,7 +28,11 @@
       <button type="button" class="btn">Share</button>
     </div>
 
-    <div class="recipe-image"></div>
+    <div class="recipe-image">
+      {% if recipe.image_url %}
+      <img src="{{ url_for('static', filename=recipe.image_url) }}" alt="{{ recipe.title }}"/>
+      {% endif %}
+    </div>
 
     <div class="section">
       <h3>Description</h3>
