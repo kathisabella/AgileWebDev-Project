@@ -48,6 +48,15 @@
           <option {% if recipe.difficulty|default('') == 'Hard' %}selected{% endif %}>Hard</option>
         </select>
       </div>
+      <div class="form-group">
+        <label for="meal_type">Meal Type</label>
+        <select id="meal_type" name="meal_type">
+          <option value="">Select</option>
+          <option {% if recipe.meal_type|default('') == 'Breakfast' %}selected{% endif %}>Breakfast</option>
+          <option {% if recipe.meal_type|default('') == 'Lunch' %}selected{% endif %}>Lunch</option>
+          <option {% if recipe.meal_type|default('') == 'Dinner' %}selected{% endif %}>Dinner</option>
+        </select>
+      </div>
     </div>
 
     <div class="row">

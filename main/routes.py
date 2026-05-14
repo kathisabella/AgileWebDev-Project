@@ -507,6 +507,7 @@ def upload_recipe():
         title = request.form.get("title", "").strip()
         cuisine = request.form.get("cuisine", "").strip()
         difficulty = request.form.get("difficulty", "").strip()
+        meal_type = request.form.get("meal_type", "").strip()
         prep_time = request.form.get("prep_time", "").strip()
         servings = request.form.get("servings", "").strip()
         description = request.form.get("description", "").strip()
@@ -519,6 +520,7 @@ def upload_recipe():
             title=title,
             cuisine=cuisine,
             difficulty=difficulty,
+            meal_type=meal_type or None,
             prep_time=int(prep_time) if prep_time.isdigit() else None,
             servings=int(servings) if servings.isdigit() else None,
             description=description,
@@ -597,6 +599,7 @@ def edit_recipe(recipe_id):
         recipe.title = request.form.get("title", "").strip() or recipe.title
         recipe.cuisine = request.form.get("cuisine", "").strip()
         recipe.difficulty = request.form.get("difficulty", "").strip()
+        recipe.meal_type = request.form.get("meal_type", "").strip() or None
         recipe.description = request.form.get("description", "").strip()
 
         prep_time = request.form.get("prep_time", "").strip()
