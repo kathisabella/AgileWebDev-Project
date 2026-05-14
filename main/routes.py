@@ -1,5 +1,5 @@
 from datetime import date
-from flask import render_template, request, redirect, url_for, session
+from flask import render_template, request, redirect, url_for, session, flash
 from sqlalchemy import func
 
 from main.forms import LoginForm, RegisterForm
@@ -53,7 +53,8 @@ def user_context(user=None):
 
 @app.route('/', methods=['GET'])
 def login_page():
-    return render_template('login.html', login_form=LoginForm(), signup_form=RegisterForm())
+    active_tab = request.args.get("tab", "login")
+    return render_template('login.html', login_form=LoginForm(), signup_form=RegisterForm(), active_tab=active_tab)
 
 ## -------- Login Page ---------------------------------------------
 @app.route("/login", methods=["POST"])
@@ -64,6 +65,7 @@ def login():
     user = User.query.filter_by(email=email).first()
 
     if user is None or not user.check_password(password):
+        flash("Invalid email or password.", "login_error")
         return redirect(url_for("login_page"))
 
     session["user_id"] = user.id
@@ -84,14 +86,19 @@ def signup():
     accept_terms = request.form.get("accept_terms")
 
     if not username or not email or not password or not accept_terms:
-        return redirect(url_for("login_page"))
+        flash("Please fill in all required fields and accept the terms.", "signup_error")
+        return redirect(url_for("login_page", tab="signup"))
 
     existing_user = User.query.filter(
         (User.username == username) | (User.email == email)
     ).first()
 
     if existing_user:
-        return redirect(url_for("login_page"))
+        if User.query.filter_by(username=username).first():
+            flash("That username is already taken.", "signup_error")
+        else:
+            flash("An account with that email already exists.", "signup_error")
+        return redirect(url_for("login_page", tab="signup"))
 
     display_name = f"{first_name} {last_name}".strip() or username
 
