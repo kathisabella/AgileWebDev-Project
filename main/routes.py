@@ -6,7 +6,7 @@ from sqlalchemy import func
 from werkzeug.utils import secure_filename
 
 from main.forms import LoginForm, RegisterForm
-from main import app, db
+from main import app, db, limiter
 from main.mealplanner import get_meal_planner_context
 from main.models import (
     User,
@@ -76,6 +76,7 @@ def login_page():
 
 ## -------- Login Page ---------------------------------------------
 @app.route("/login", methods=["POST"])
+@limiter.limit("10 per minute")
 def login():
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password", "")
@@ -95,6 +96,7 @@ def login():
 
 ## -------- Sign Up Page ---------------------------------------------
 @app.route("/signup", methods=["POST"])
+@limiter.limit("5 per minute")
 def signup():
     first_name = request.form.get("first_name", "").strip()
     last_name = request.form.get("last_name", "").strip()
