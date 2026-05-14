@@ -268,6 +268,7 @@ button, input, select { font: inherit; }
 
 body.page-meal-planner .content { overflow: auto; }
 body.page-meal-planner .wrapper { height: auto; min-height: 100vh; overflow: visible; }
+body.page-meal-planner .sidebar { position: sticky; top: 0; height: 100vh; }
 body.page-meal-planner .page-intro {
   display: flex;
   justify-content: space-between;
@@ -523,8 +524,10 @@ body.page-recipe-details .actions { margin-bottom: 18px; }
 body.page-recipe-details .btn { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--color-sage); background: #fff; font-size: 0.75rem; cursor: pointer; }
 body.page-recipe-details .btn.primary { background: var(--color-text); color: #fff; }
 
-.recipe-image { height: 220px; border-radius: 12px; background: var(--color-surface-alt); display: flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 18px; }
+.recipe-image { height: 220px; border-radius: 12px; background: var(--color-surface-alt); display: flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 18px; overflow: hidden; }
 .section { margin-bottom: 22px; }
+.recipe-image img { width: 100%; height: 100%; object-fit: cover; }
+.recipe-thumb img { width: 100%; height: 100%; object-fit: cover; }
 .section h3 { font-family: var(--font-head); font-size: 1rem; margin-bottom: 8px; }
 .ingredients li, .steps li { font-size: 0.82rem; margin-bottom: 6px; }
 .steps li { margin-bottom: 10px; }
@@ -1139,6 +1142,7 @@ button, input, select { font: inherit; }
 ════════════════════════════════════════════ */
 
 body.page-meal-planner .wrapper { height: auto; min-height: 100vh; overflow: visible; }
+body.page-meal-planner .sidebar { position: sticky; top: 0; height: 100vh; }
 body.page-meal-planner .content { padding: 28px; }
 body.page-meal-planner .page-intro {
   display: flex;

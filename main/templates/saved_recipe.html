@@ -36,10 +36,10 @@
 <div class="toolbar">
   <div class="toolbar-left">
     <span>Sort by</span>
-      <select id="sortSelect" class="sort-select">
-        <option value="recent">Recently saved</option>
-        <option value="cook_time">Cook time</option>
-      </select>
+    <select id="sortSelect" class="sort-select">
+      <option value="recent">Recently saved</option>
+      <option value="cook_time">Cook time</option>
+    </select>
   </div>
   <div class="view-toggle">
     <button class="view-btn active" data-view="grid">⊞ Grid</button>
@@ -50,7 +50,12 @@
 <div id="recipesContainer" class="recipe-grid">
   {% for recipe in recipes %}
   <div class="recipe-card" data-index="{{ loop.index0 }}" data-cook-time="{{ recipe.prep_time }}">
-    <div class="recipe-thumb"></div>
+
+    <div class="recipe-thumb">
+      {% if recipe.image_url %}
+        <img src="{{ url_for('static', filename=recipe.image_url) }}" alt="{{ recipe.title }}">
+      {% endif %}
+    </div>
     <div class="recipe-body">
       <p class="recipe-name">{{ recipe.title }}</p>
       <p class="recipe-by">by {{ recipe.author.display_name }}</p>

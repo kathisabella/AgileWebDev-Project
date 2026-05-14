@@ -155,6 +155,54 @@ Automated tests are not yet in place; all test cases below are manual.
 
 ---
 
+## 10. Rate Limiting
+
+### 10.1 Login — brute-force blocked
+**Steps:** Submit the login form with wrong credentials more than 10 times within one minute from the same IP.  
+**Expected:** Returns a `429 Too Many Requests` response.  
+**Status:** Pass
+
+### 10.2 Signup — rate limited
+**Steps:** Submit the signup form more than 5 times within one minute from the same IP.  
+**Expected:** Returns a `429 Too Many Requests` response.  
+**Status:** Pass
+
+### 10.3 Normal usage not affected
+**Steps:** Log in successfully within the first 10 attempts in a minute.  
+**Expected:** Login proceeds normally with no rate limit error.  
+**Status:** Pass
+
+---
+
+## 11. Image Upload
+
+### 11.1 Upload recipe with image
+**Steps:** Go to `/upload`, fill in required fields, attach a `.jpg` or `.png` image, submit.  
+**Expected:** Redirected to recipe detail page; image displays in the image area.  
+**Status:** Pass
+
+### 11.2 Image shows on recipe cards
+**Steps:** After uploading a recipe with an image, check the Explore and Dashboard pages.  
+**Expected:** Recipe card thumbnail shows the uploaded image.  
+**Status:** Pass
+
+### 11.3 Edit recipe — existing image preserved
+**Steps:** Edit an existing recipe without selecting a new image file, save.  
+**Expected:** Original image still displays on the recipe detail page.  
+**Status:** Pass
+
+### 11.4 Edit recipe — replace image
+**Steps:** Edit an existing recipe and attach a new image file, save.  
+**Expected:** New image replaces the old one on the recipe detail page.  
+**Status:** Pass
+
+### 11.5 Upload without image
+**Steps:** Submit the upload form without attaching an image.  
+**Expected:** Recipe is created successfully; image area shows the blank placeholder.  
+**Status:** Pass
+
+---
+
 ## Known issues / out of scope
 
 - Google OAuth ("Continue with Google") button is not yet functional.
