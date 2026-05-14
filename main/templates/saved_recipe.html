@@ -36,12 +36,10 @@
 <div class="toolbar">
   <div class="toolbar-left">
     <span>Sort by</span>
-    <select class="sort-select">
-      <option>Recently saved</option>
-      <option>Most popular</option>
-      <option>Cook time</option>
-      <option>Rating</option>
-    </select>
+      <select id="sortSelect" class="sort-select">
+        <option value="recent">Recently saved</option>
+        <option value="cook_time">Cook time</option>
+      </select>
   </div>
   <div class="view-toggle">
     <button class="view-btn active" data-view="grid">⊞ Grid</button>
@@ -51,7 +49,7 @@
 
 <div id="recipesContainer" class="recipe-grid">
   {% for recipe in recipes %}
-  <div class="recipe-card">
+  <div class="recipe-card" data-index="{{ loop.index0 }}" data-cook-time="{{ recipe.prep_time }}">
     <div class="recipe-thumb"></div>
     <div class="recipe-body">
       <p class="recipe-name">{{ recipe.title }}</p>
@@ -67,9 +65,32 @@
   <p class="empty-state">No saved recipes yet.</p>
   {% endfor %}
 </div>
+
+<!-- Sort recipes -->
+<script>
+  const sortSelect = document.getElementById('sortSelect');
+  const recipesContainer = document.getElementById('recipesContainer');
+
+  sortSelect.addEventListener('change', () => {
+    const cards = Array.from(recipesContainer.querySelectorAll('.recipe-card'));
+
+    if (sortSelect.value === 'cook_time') {
+      cards.sort((a, b) => {
+        return Number(a.dataset.cookTime) - Number(b.dataset.cookTime);
+      });
+    } else {
+      cards.sort((a, b) => {
+        return Number(a.dataset.index) - Number(b.dataset.index);
+      });
+    }
+
+    cards.forEach(card => recipesContainer.appendChild(card));
+  });
+</script>
+
+<!-- grid and list toggle -->
 <script>
   const viewButtons = document.querySelectorAll('.view-btn');
-  const recipesContainer = document.getElementById('recipesContainer');
 
   viewButtons.forEach(button => {
     button.addEventListener('click', () => {
