@@ -53,40 +53,60 @@ pip install -r requirements.txt
 
 ### 4. Set up environment variables
 
-This project uses environment variables stored in a `.env` file.
+Create a `.env` file in the project root:
 
-```bash
-echo "secret-key" >> .env
+```
+APP_SECRET_KEY=your-secret-key-here
 ```
 
-Open `.env` and fill in any required values.
+`APP_SECRET_KEY` can be any random string for local development.
 
-### 5. Create the database
+### 5. Set up the database
+
 Run the database migrations:
 
 ```bash
 flask --app app db upgrade
 ```
 
-This will create:
+This will create `main/plateful.db`.
 
+### 6. Seed demo data (optional)
+
+To populate the database with demo users and recipes:
+
+```bash
+flask shell
 ```
-main/plateful.db
+```python
+>>> from main.models import create_test_data
+>>> create_test_data()
 ```
 
-### 6. Run the app
+Demo accounts created:
+
+| Email | Password |
+|---|---|
+| demo@plateful.com | demo1234 |
+| alice@plateful.com | alice1234 |
+| ben@plateful.com | ben1234 |
+| cara@plateful.com | cara1234 |
+
+> Re-run `create_test_data()` at any time to reset the database back to the demo state.
+
+### 7. Run the app
 
 ```bash
 python app.py
 ```
 
-### 7. Open in browser
+### 8. Open in browser
 
 ```
 http://127.0.0.1:5000
 ```
 
-### 8. Stop the server
+### 9. Stop the server
 
 Press `Ctrl + C` to stop. Run `deactivate` to exit the virtual environment.
 
@@ -145,12 +165,16 @@ Plateful-AgileWD-Project-2026/
 
 ## Tech Stack
 
-| Layer      | Technology                       |
-|------------|----------------------------------|
-| Backend    | Python · Flask                   |
-| Frontend   | HTML · CSS · JavaScript          |
-| Templating | Jinja2                           |
-| Fonts      | Google Fonts (Fraunces, Figtree) |
+| Layer      | Technology                                        |
+|------------|---------------------------------------------------|
+| Backend    | Python · Flask                                    |
+| Database   | SQLite · SQLAlchemy · Flask-Migrate (Alembic)     |
+| Forms      | Flask-WTF · WTForms (with CSRF protection)        |
+| Auth       | Werkzeug password hashing · Flask sessions        |
+| Frontend   | HTML · CSS · JavaScript                           |
+| Templating | Jinja2                                            |
+| Fonts      | Google Fonts (Fraunces, Figtree)                  |
+
 
 ## Further Documentation (To Be Changed)
 **This is for linking to additional user documentations (if there are any), else delete if not needed.**
