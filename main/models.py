@@ -48,7 +48,7 @@ class Recipe(db.Model):
     ingredients = db.relationship("Ingredient", backref="recipe", lazy=True)
     steps = db.relationship("RecipeStep", backref="recipe", lazy=True)
     saved_by = db.relationship("SavedRecipe", backref="recipe", lazy=True)
-    meal_plan_entries = db.relationship("MealPlanEntry", backref="recipe", lazy=True)
+    meal_plan_entries = db.relationship("MealPlanEntry", backref="recipe", lazy=True, cascade="all, delete-orphan")
 
 class Ingredient(db.Model):
     __tablename__ = "ingredient"

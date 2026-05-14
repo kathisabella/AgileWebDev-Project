@@ -1,6 +1,8 @@
 import random
 from datetime import datetime
-from flask import request, session
+from flask import request
+from main import db
+from main.models import MealPlanEntry
 
 
 def get_recipes_for_meal(meal_type, saved_recipes):
@@ -63,6 +65,50 @@ def delete_day_and_reorder(current_plan, day_to_delete):
 
     return new_plan
 
+
+def load_user_meal_plan(user):
+    entries = MealPlanEntry.query.filter_by(user_id=user["id"]).order_by(MealPlanEntry.day).all()
+
+    meal_plan = {}
+
+    for entry in entries:
+        if entry.day not in meal_plan:
+            meal_plan[entry.day] = {}
+
+        if entry.recipe is None:
+            meal_plan[entry.day][entry.meal_type] = None
+        else:
+            meal_plan[entry.day][entry.meal_type] = {
+                "id": entry.recipe.id,
+                "name": entry.recipe.title,
+                "time": entry.recipe.prep_time,
+                "meal_type": entry.recipe.meal_type,
+                "tag": entry.recipe.cuisine
+            }
+
+    return meal_plan
+
+
+def save_user_meal_plan(user, meal_plan):
+    MealPlanEntry.query.filter_by(user_id=user["id"]).delete()
+
+    for day in meal_plan:
+        for meal_type in meal_plan[day]:
+            recipe = meal_plan[day][meal_type]
+
+            entry = MealPlanEntry(
+                user_id=user["id"],
+                recipe_id=recipe["id"] if recipe else None,
+                day=day,
+                meal_type=meal_type,
+                week_start_date=datetime.now().date()
+            )
+
+            db.session.add(entry)
+
+    db.session.commit()
+
+
 def get_plan_stats(week_plan, saved_recipes):
     meals_filled = 0
     quickest_recipe = None
@@ -93,29 +139,25 @@ def get_meal_planner_context(days, meal_types, saved_recipes, user):
     action = request.args.get("action")
     day_to_delete = request.args.get("day")
 
-    if "meal_plan" not in session:
-        session["meal_plan"] = {}
-
-    current_plan = session["meal_plan"]
+    current_plan = load_user_meal_plan(user)
 
     if action == "shuffle_day":
         if len(current_plan) < 7:
             next_day = f"Day {len(current_plan) + 1}"
             current_plan[next_day] = make_one_day_plan(current_plan, meal_types, saved_recipes)
-            session["meal_plan"] = current_plan
-            session.modified = True
+            save_user_meal_plan(user, current_plan)
 
     elif action == "delete_day":
-        session["meal_plan"] = delete_day_and_reorder(current_plan, day_to_delete)
-        session.modified = True
+        current_plan = delete_day_and_reorder(current_plan, day_to_delete)
+        save_user_meal_plan(user, current_plan)
 
     elif action == "clear_all":
-        session["meal_plan"] = {}
-        session.modified = True
+        current_plan = {}
+        save_user_meal_plan(user, current_plan)
 
-    stats = get_plan_stats(session["meal_plan"], saved_recipes)
+    stats = get_plan_stats(current_plan, saved_recipes)
 
-    generated_days = list(session["meal_plan"].keys())
+    generated_days = list(current_plan.keys())
 
     if len(generated_days) == 0:
         display_days = ["Day 1"]
@@ -133,7 +175,7 @@ def get_meal_planner_context(days, meal_types, saved_recipes, user):
         "display_days": display_days,
         "generated_days": generated_days,
         "meal_types": meal_types,
-        "week_plan": session["meal_plan"],
+        "week_plan": current_plan,
         "saved_recipes": saved_recipes,
         "stats": stats
     }
