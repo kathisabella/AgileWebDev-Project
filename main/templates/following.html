@@ -37,6 +37,7 @@
               <p class="sub">{{ user.username }}</p>
             </div>
             <form method="POST" action="{{ url_for('unfollow_user', user_id=user.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <button type="submit" class="btn-sm-follow">Following</button>
             </form>
           </li>
