@@ -81,7 +81,21 @@
     <a href="{{ url_for('upload_recipe') }}">+ New Recipe</a>
   </div>
   <div class="recipe-grid">
+    {% for recipe in recipes %}
+    <div class="recipe-card">
+      <div class="recipe-thumb"></div>
+      <div class="recipe-body">
+        <p class="recipe-name">{{ recipe.title }}</p>
+        <div class="recipe-meta">
+          <span class="tag">{{ recipe.cuisine }}</span>
+          <span>{{ recipe.prep_time }} min</span>
+        </div>
+        <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+      </div>
+    </div>
+    {% else %}
     <p class="empty-state">No recipes posted yet.</p>
+    {% endfor %}
   </div>
 </div>
 
@@ -91,7 +105,24 @@
     <h3>Saved recipes</h3>
     <span style="font-size:0.78rem; color:var(--color-muted);">{{ saved_count|default(0) }} recipe{{ 's' if saved_count != 1 else '' }}</span>
   </div>
-  <p class="empty-state">No saved recipes yet.</p>
+  <div class="recipe-grid">
+    {% for recipe in saved_recipes %}
+    <div class="recipe-card">
+      <div class="recipe-thumb"></div>
+      <div class="recipe-body">
+        <p class="recipe-name">{{ recipe.title }}</p>
+        <p class="recipe-by">by {{ recipe.author.display_name }}</p>
+        <div class="recipe-meta">
+          <span class="tag">{{ recipe.cuisine }}</span>
+          <span>{{ recipe.prep_time }} min</span>
+        </div>
+        <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+      </div>
+    </div>
+    {% else %}
+    <p class="empty-state">No saved recipes yet.</p>
+    {% endfor %}
+  </div>
 </div>
 
 <!-- TAB: ACTIVITY -->

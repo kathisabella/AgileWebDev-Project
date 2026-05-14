@@ -32,6 +32,7 @@
 
   <!-- LOGIN -->
   <form action="{{ url_for('login') }}" method="post" id="panel-login" class="form-panel active">
+    {{ login_form.hidden_tag() }}
     <div class="form-heading">
       <h2>{{ greeting|default('Welcome') }} back</h2>
       <p>Sign in to your account</p>
@@ -66,6 +67,7 @@
 
   <!-- SIGN UP -->
   <form action="{{ url_for('signup') }}" method="post" id="panel-signup" class="form-panel">
+    {{ signup_form.hidden_tag() }}
     <div class="form-heading">
       <h2>Join Plateful</h2>
       <p>Create a new account</p>
