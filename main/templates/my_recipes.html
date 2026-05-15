@@ -44,7 +44,11 @@
         <div class="recipe-meta">
           <span class="tag">{{ recipe.cuisine or '' }}</span>
           <span>{{ recipe.difficulty or '' }}</span>
-          <span>{{ recipe.prep_time or '?' }} min</span>
+          {% if recipe.prep_time %}
+            <span>{{ recipe.prep_time }} mins</span>
+          {% else %}
+            <span>No time listed</span>
+          {% endif %}
         </div>
         <div class="actions" style="margin-top: 12px;">
           <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
