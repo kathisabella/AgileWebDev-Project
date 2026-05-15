@@ -199,7 +199,7 @@ def dashboard():
             text = f"Saved recipe: {item.related_recipe.title}"
         else:
             text = item.activity_type
-        activity_feed.mainend({"text": text, "time": item.created_at.strftime("%d %b %Y")})
+        activity_feed.append({"text": text, "time": item.created_at.strftime("%d %b %Y")})
 
     return render_template(
         "dashboard.html",
@@ -387,7 +387,7 @@ def profile():
         else:
             text = item.activity_type
 
-        activity_feed.mainend({
+        activity_feed.append({
             "text": text,
             "time": item.created_at.strftime("%d %b %Y")
         })
