@@ -1,8 +1,9 @@
 import unittest
+from datetime import date
 from sqlalchemy.exc import IntegrityError
 from main import create_app, db
 from main.config import TestConfig
-from main.models import User, Recipe, Ingredient, RecipeStep, SavedRecipe, Follow
+from main.models import User, Recipe, Ingredient, RecipeStep, SavedRecipe, Follow, MealPlanEntry, Activity
 
 
 def add_test_data():
@@ -86,6 +87,11 @@ class UserModelTests(unittest.TestCase):
                                msg='Duplicate email should raise an IntegrityError'):
             db.session.commit()
 
+    def test_user_joined_date_set_automatically(self):
+        u = User.query.filter_by(username='testchef').first()
+        self.assertIsNotNone(u.joined_date,
+                             'joined_date should be set automatically on user creation')
+
     # --- Recipe tests ---
 
     def test_recipe_linked_to_author(self):
@@ -113,6 +119,14 @@ class UserModelTests(unittest.TestCase):
         self.assertEqual(recipe.steps[0].instruction, 'Boil pasta',
                          'Step instruction should be Boil pasta')
 
+    def test_recipe_fields_stored_correctly(self):
+        recipe = Recipe.query.filter_by(title='Test Pasta').first()
+        self.assertEqual(recipe.cuisine, 'Italian', 'Cuisine should be Italian')
+        self.assertEqual(recipe.difficulty, 'Easy', 'Difficulty should be Easy')
+        self.assertEqual(recipe.prep_time, 20, 'Prep time should be 20')
+        self.assertEqual(recipe.servings, 2, 'Servings should be 2')
+        self.assertEqual(recipe.meal_type, 'Dinner', 'Meal type should be Dinner')
+
     # --- Save recipe tests ---
 
     def test_save_recipe(self):
@@ -132,6 +146,17 @@ class UserModelTests(unittest.TestCase):
         with self.assertRaises(IntegrityError,
                                msg='Saving the same recipe twice should raise an IntegrityError'):
             db.session.commit()
+
+    def test_unsave_recipe(self):
+        user = User.query.filter_by(username='foodlover').first()
+        recipe = Recipe.query.filter_by(title='Test Pasta').first()
+        saved = SavedRecipe(user_id=user.id, recipe_id=recipe.id)
+        db.session.add(saved)
+        db.session.commit()
+        db.session.delete(saved)
+        db.session.commit()
+        result = SavedRecipe.query.filter_by(user_id=user.id, recipe_id=recipe.id).first()
+        self.assertIsNone(result, 'Recipe should be removed from saved recipes after unsaving')
 
     # --- Follow tests ---
 
@@ -159,6 +184,89 @@ class UserModelTests(unittest.TestCase):
         follow = Follow.query.filter_by(follower_id=user.id, following_id=user.id).first()
         self.assertIsNone(follow,
                           'A user should not be able to follow themselves')
+
+    def test_duplicate_follow_rejected(self):
+        user1 = User.query.filter_by(username='testchef').first()
+        user2 = User.query.filter_by(username='foodlover').first()
+        db.session.add(Follow(follower_id=user2.id, following_id=user1.id))
+        db.session.commit()
+        db.session.add(Follow(follower_id=user2.id, following_id=user1.id))
+        with self.assertRaises(IntegrityError,
+                               msg='Following the same user twice should raise an IntegrityError'):
+            db.session.commit()
+
+    # --- MealPlanEntry tests ---
+
+    def test_meal_plan_entry_saved(self):
+        user = User.query.filter_by(username='testchef').first()
+        recipe = Recipe.query.filter_by(title='Test Pasta').first()
+        entry = MealPlanEntry(
+            user_id=user.id,
+            recipe_id=recipe.id,
+            day='Day 1',
+            meal_type='Dinner',
+            week_start_date=date.today()
+        )
+        db.session.add(entry)
+        db.session.commit()
+        result = MealPlanEntry.query.filter_by(user_id=user.id, day='Day 1', meal_type='Dinner').first()
+        self.assertIsNotNone(result, 'MealPlanEntry should exist after being saved')
+        self.assertEqual(result.recipe_id, recipe.id,
+                         'MealPlanEntry should reference the correct recipe')
+
+    def test_meal_plan_entry_without_recipe(self):
+        user = User.query.filter_by(username='testchef').first()
+        entry = MealPlanEntry(
+            user_id=user.id,
+            recipe_id=None,
+            day='Day 2',
+            meal_type='Breakfast',
+            week_start_date=date.today()
+        )
+        db.session.add(entry)
+        db.session.commit()
+        result = MealPlanEntry.query.filter_by(user_id=user.id, day='Day 2').first()
+        self.assertIsNotNone(result, 'MealPlanEntry with no recipe should still be saved')
+        self.assertIsNone(result.recipe_id, 'recipe_id should be None for an empty slot')
+
+    # --- Activity tests ---
+
+    def test_activity_recorded_for_upload(self):
+        user = User.query.filter_by(username='testchef').first()
+        recipe = Recipe.query.filter_by(title='Test Pasta').first()
+        db.session.add(Activity(
+            user_id=user.id,
+            activity_type='uploaded_recipe',
+            related_recipe_id=recipe.id
+        ))
+        db.session.commit()
+        result = Activity.query.filter_by(user_id=user.id, activity_type='uploaded_recipe').first()
+        self.assertIsNotNone(result, 'Activity record should exist after uploading a recipe')
+        self.assertEqual(result.related_recipe_id, recipe.id,
+                         'Activity should reference the correct recipe')
+
+    def test_activity_recorded_for_follow(self):
+        user1 = User.query.filter_by(username='testchef').first()
+        user2 = User.query.filter_by(username='foodlover').first()
+        db.session.add(Activity(
+            user_id=user2.id,
+            activity_type='followed_user',
+            related_user_id=user1.id
+        ))
+        db.session.commit()
+        result = Activity.query.filter_by(user_id=user2.id, activity_type='followed_user').first()
+        self.assertIsNotNone(result, 'Activity record should exist after following a user')
+        self.assertEqual(result.related_user_id, user1.id,
+                         'Activity should reference the correct followed user')
+
+    def test_multiple_activities_for_user(self):
+        user = User.query.filter_by(username='testchef').first()
+        recipe = Recipe.query.filter_by(title='Test Pasta').first()
+        db.session.add(Activity(user_id=user.id, activity_type='uploaded_recipe', related_recipe_id=recipe.id))
+        db.session.add(Activity(user_id=user.id, activity_type='saved_recipe', related_recipe_id=recipe.id))
+        db.session.commit()
+        count = Activity.query.filter_by(user_id=user.id).count()
+        self.assertEqual(count, 2, 'User should have 2 activity records')
 
 
 if __name__ == '__main__':
