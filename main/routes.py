@@ -6,7 +6,8 @@ from sqlalchemy import func
 from werkzeug.utils import secure_filename
 
 from main.forms import LoginForm, RegisterForm
-from main import app, db, limiter
+from main import db, limiter
+from main.blueprints import main
 from main.mealplanner import get_meal_planner_context
 from main.models import (
     User,
@@ -75,7 +76,7 @@ def login_page():
     return render_template('login.html', login_form=LoginForm(), signup_form=RegisterForm(), active_tab=active_tab)
 
 ## -------- Login Page ---------------------------------------------
-@app.route("/login", methods=["POST"])
+@main.route("/login", methods=["POST"])
 @limiter.limit("3 per minute")
 def login():
     email = request.form.get("email", "").strip().lower()
@@ -85,7 +86,7 @@ def login():
 
     if user is None or not user.check_password(password):
         flash("Invalid email or password.", "login_error")
-        return redirect(url_for("login_page"))
+        return redirect(url_for("main.login_page"))
 
     session["user_id"] = user.id
     session["username"] = user.username
@@ -95,7 +96,7 @@ def login():
     return redirect(url_for("main.dashboard"))
 
 ## -------- Sign Up Page ---------------------------------------------
-@app.route("/signup", methods=["POST"])
+@main.route("/signup", methods=["POST"])
 @limiter.limit("3 per minute")
 def signup():
     first_name = request.form.get("first_name", "").strip()
@@ -107,7 +108,7 @@ def signup():
 
     if not username or not email or not password or not accept_terms:
         flash("Please fill in all required fields and accept the terms.", "signup_error")
-        return redirect(url_for("login_page", tab="signup"))
+        return redirect(url_for("main.login_page", tab="signup"))
 
     existing_user = User.query.filter(
         (User.username == username) | (User.email == email)
@@ -118,7 +119,7 @@ def signup():
             flash("That username is already taken.", "signup_error")
         else:
             flash("An account with that email already exists.", "signup_error")
-        return redirect(url_for("login_page", tab="signup"))
+        return redirect(url_for("main.login_page", tab="signup"))
 
     display_name = f"{first_name} {last_name}".strip() or username
 
@@ -334,7 +335,7 @@ def following():
     )
 
 ## -------- Follow / Unfollow ---------------------------------------------
-@app.route("/follow/<int:user_id>", methods=["POST"])
+@main.route("/follow/<int:user_id>", methods=["POST"])
 def follow_user(user_id):
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -352,10 +353,10 @@ def follow_user(user_id):
             ))
             db.session.commit()
 
-    return redirect(request.referrer or url_for("following"))
+    return redirect(request.referrer or url_for("main.following"))
 
 
-@app.route("/unfollow/<int:user_id>", methods=["POST"])
+@main.route("/unfollow/<int:user_id>", methods=["POST"])
 def unfollow_user(user_id):
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -367,7 +368,7 @@ def unfollow_user(user_id):
         db.session.delete(follow)
         db.session.commit()
 
-    return redirect(request.referrer or url_for("following"))
+    return redirect(request.referrer or url_for("main.following"))
 
 ## -------- Meal Planner Page ---------------------------------------------
 @main.route("/meal-planner", methods=["GET"])
@@ -404,7 +405,7 @@ def meal_planner():
 
     return render_template("mealplanner.html", **context)
 
-@app.route("/meal-planner/shuffle-day", methods=["POST"])
+@main.route("/meal-planner/shuffle-day", methods=["POST"])
 def meal_planner_shuffle_day():
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -436,10 +437,10 @@ def meal_planner_shuffle_day():
         action_override="shuffle_day",
     )
 
-    return redirect(url_for("meal_planner", _anchor="meal-planner-table"))
+    return redirect(url_for("main.meal_planner", _anchor="meal-planner-table"))
 
 
-@app.route("/meal-planner/delete-day", methods=["POST"])
+@main.route("/meal-planner/delete-day", methods=["POST"])
 def meal_planner_delete_day():
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -473,10 +474,10 @@ def meal_planner_delete_day():
         day_override=day,
     )
 
-    return redirect(url_for("meal_planner", _anchor="meal-planner-table"))
+    return redirect(url_for("main.meal_planner", _anchor="meal-planner-table"))
 
 
-@app.route("/meal-planner/clear-all", methods=["POST"])
+@main.route("/meal-planner/clear-all", methods=["POST"])
 def meal_planner_clear_all():
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -495,7 +496,7 @@ def meal_planner_clear_all():
         action_override="clear_all",
     )
 
-    return redirect(url_for("meal_planner", _anchor="meal-planner-table"))
+    return redirect(url_for("main.meal_planner", _anchor="meal-planner-table"))
 
 ## -------- Profile Page ---------------------------------------------
 @main.route("/profile", methods=["GET"])
@@ -857,7 +858,7 @@ def save_recipe(recipe_id):
     return redirect(url_for("main.recipe_details", recipe_id=recipe.id))
 
 ## -------- Delete Saved Recipe Page ---------------------------------------------
-@app.route("/recipe/<int:recipe_id>/unsave", methods=["POST"])
+@main.route("/recipe/<int:recipe_id>/unsave", methods=["POST"])
 def unsave_recipe(recipe_id):
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -873,10 +874,10 @@ def unsave_recipe(recipe_id):
     db.session.delete(saved_recipe)
     db.session.commit()
 
-    return redirect(url_for("saved_recipes"))
+    return redirect(url_for("main.saved_recipes"))
 
 ## -------- Public User Profile Page ---------------------------------------------
-@app.route("/user/<int:user_id>", methods=["GET"])
+@main.route("/user/<int:user_id>", methods=["GET"])
 def user_profile(user_id):
     redirect_response = login_required_redirect()
     if redirect_response:
@@ -887,7 +888,7 @@ def user_profile(user_id):
 
     # Redirect to own profile page if viewing yourself
     if profile_user.id == current_user.id:
-        return redirect(url_for("profile"))
+        return redirect(url_for("main.profile"))
 
     recipes = (
         Recipe.query
