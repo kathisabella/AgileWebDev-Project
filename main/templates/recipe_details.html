@@ -16,16 +16,27 @@
     <div class="recipe-header">
       <h1>{{ recipe.title|default('Recipe title') }}</h1>
       <div class="recipe-meta">
-        {{ recipe.cuisine|default('Cuisine') }} · {{ recipe.prep_time|default('Time') }} minutes · {{ recipe.difficulty|default('Difficulty') }} · by {{ recipe.author.display_name|default(username|default('@username')) }}
+        {{ recipe.cuisine or 'Cuisine' }} · {{ recipe.prep_time or '?' }} minutes · {{ recipe.difficulty or 'Difficulty' }} ·
+        by <a href="{{ url_for('user_profile', user_id=recipe.author.id) }}" style="color:inherit; text-decoration:underline;">{{ recipe.author.display_name }}</a>
       </div>
     </div>
 
     <div class="actions">
-      <form action="{{ url_for('save_recipe', recipe_id=recipe_id|default(0)) }}" method="post" style="display:inline;">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button type="submit" class="btn primary">Save</button>
-      </form>
-      <button type="button" class="btn">Share</button>
+      {% if not is_own_recipe %}
+        {% if is_saved %}
+        <form action="{{ url_for('unsave_recipe', recipe_id=recipe_id) }}" method="post" style="display:inline;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn">Saved ✓</button>
+        </form>
+        {% else %}
+        <form action="{{ url_for('save_recipe', recipe_id=recipe_id) }}" method="post" style="display:inline;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn primary">Save</button>
+        </form>
+        {% endif %}
+      {% else %}
+      <a href="{{ url_for('edit_recipe', recipe_id=recipe_id) }}" class="btn">Edit</a>
+      {% endif %}
     </div>
 
     <div class="recipe-image">
@@ -76,14 +87,43 @@
   </div>
 
   <div>
+    <!-- Author card -->
     <div class="side-card">
-      <p class="empty-inline">Add supporting recipe details here.</p>
+      <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
+        <a href="{{ url_for('user_profile', user_id=recipe.author.id) }}" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.75rem;">
+          <div class="avatar">{{ recipe.author.display_name[:2].upper() }}</div>
+          <div>
+            <p style="font-weight:600; font-size:0.9rem;">{{ recipe.author.display_name }}</p>
+            <p style="font-size:0.78rem; color:var(--color-muted);">@{{ recipe.author.username }}</p>
+          </div>
+        </a>
+      </div>
+      {% if recipe.author.bio %}
+      <p style="font-size:0.82rem; color:var(--color-muted); margin-bottom:0.75rem;">{{ recipe.author.bio }}</p>
+      {% endif %}
+      {% if not is_own_recipe %}
+        {% if is_following_author %}
+        <form method="POST" action="{{ url_for('unfollow_user', user_id=recipe.author.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn" style="width:100%;">Following</button>
+        </form>
+        {% else %}
+        <form method="POST" action="{{ url_for('follow_user', user_id=recipe.author.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn primary" style="width:100%;">+ Follow</button>
+        </form>
+        {% endif %}
+      {% endif %}
     </div>
+
+    <!-- Recipe summary card -->
     <div class="side-card">
-      <p class="empty-inline">Add supporting recipe details here.</p>
-    </div>
-    <div class="side-card">
-      <p class="empty-inline">Add supporting recipe details here.</p>
+      <p style="font-weight:600; font-size:0.85rem; margin-bottom:0.5rem;">Recipe summary</p>
+      <p style="font-size:0.82rem; color:var(--color-muted);"> Serves {{ recipe.servings or '?' }}</p>
+      <p style="font-size:0.82rem; color:var(--color-muted);"> {{ recipe.prep_time or '?' }} min prep</p>
+      <p style="font-size:0.82rem; color:var(--color-muted);"> {{ recipe.difficulty or 'Unknown difficulty' }}</p>
+      <p style="font-size:0.82rem; color:var(--color-muted);"> {{ recipe.cuisine or 'Unknown cuisine' }}</p>
+      <p style="font-size:0.82rem; color:var(--color-muted);"> {{ recipe.meal_type or 'Any meal' }}</p>
     </div>
   </div>
 
