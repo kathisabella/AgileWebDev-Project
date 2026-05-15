@@ -16,8 +16,5 @@ class TestConfig(Config):
     TESTING = True
     WTF_CSRF_ENABLED = False
 
-class SeleniumTestConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///selenium_test.db'
-    TESTING = True
-    WTF_CSRF_ENABLED = False
+
 
