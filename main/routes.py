@@ -814,6 +814,8 @@ def delete_recipe(recipe_id):
     if recipe.author_id != user.id:
         return redirect(url_for("dashboard"))
 
+    Activity.query.filter_by(related_recipe_id=recipe.id).update( {"related_recipe_id": None} )
+
     db.session.delete(recipe)
     db.session.commit()
 
