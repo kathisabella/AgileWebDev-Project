@@ -223,6 +223,8 @@ def dashboard():
             text = f"Uploaded recipe: {item.related_recipe.title}"
         elif item.activity_type == "saved_recipe" and item.related_recipe:
             text = f"Saved recipe: {item.related_recipe.title}"
+        elif item.activity_type == "followed_user" and item.related_user:
+            text = f"Followed {item.related_user.display_name}"
         else:
             text = item.activity_type
         activity_feed.append({"text": text, "time": item.created_at.strftime("%d %b %Y")})
@@ -316,11 +318,19 @@ def following():
 
     following_rows = Follow.query.filter_by(follower_id=user.id).all()
     following_users = [row.following for row in following_rows]
+    following_ids = {row.following_id for row in following_rows}
+
+    # Suggested: all users except yourself and those you already follow
+    base_query = User.query.filter(User.id != user.id)
+    if following_ids:
+        base_query = base_query.filter(~User.id.in_(following_ids))
+    suggested_users = base_query.order_by(func.random()).limit(6).all()
 
     return render_template(
         "following.html",
         **user_context(user),
         following=following_users,
+        suggested_users=suggested_users,
     )
 
 ## -------- Follow / Unfollow ---------------------------------------------
@@ -335,6 +345,11 @@ def follow_user(user_id):
         already = Follow.query.filter_by(follower_id=user.id, following_id=user_id).first()
         if not already:
             db.session.add(Follow(follower_id=user.id, following_id=user_id))
+            db.session.add(Activity(
+                user_id=user.id,
+                activity_type="followed_user",
+                related_user_id=user_id,
+            ))
             db.session.commit()
 
     return redirect(request.referrer or url_for("following"))
@@ -560,6 +575,8 @@ def profile():
             text = f"Uploaded recipe: {item.related_recipe.title}"
         elif item.activity_type == "saved_recipe" and item.related_recipe:
             text = f"Saved recipe: {item.related_recipe.title}"
+        elif item.activity_type == "followed_user" and item.related_user:
+            text = f"Followed {item.related_user.display_name}"
         else:
             text = item.activity_type
 
@@ -696,13 +713,31 @@ def recipe_details(recipe_id):
     if redirect_response:
         return redirect_response
 
+    current_user = get_current_user()
     recipe = Recipe.query.get_or_404(recipe_id)
+
+    is_own_recipe = recipe.author_id == current_user.id
+
+    is_following_author = False
+    if not is_own_recipe:
+        is_following_author = Follow.query.filter_by(
+            follower_id=current_user.id,
+            following_id=recipe.author_id
+        ).first() is not None
+
+    is_saved = SavedRecipe.query.filter_by(
+        user_id=current_user.id,
+        recipe_id=recipe.id
+    ).first() is not None
 
     return render_template(
         "recipe_details.html",
-        **user_context(),
+        **user_context(current_user),
         recipe=recipe,
         recipe_id=recipe.id,
+        is_own_recipe=is_own_recipe,
+        is_following_author=is_following_author,
+        is_saved=is_saved,
     )
 
 ## -------- Edit Recipe Page ---------------------------------------------
@@ -837,6 +872,48 @@ def unsave_recipe(recipe_id):
     db.session.commit()
 
     return redirect(url_for("saved_recipes"))
+
+## -------- Public User Profile Page ---------------------------------------------
+@app.route("/user/<int:user_id>", methods=["GET"])
+def user_profile(user_id):
+    redirect_response = login_required_redirect()
+    if redirect_response:
+        return redirect_response
+
+    current_user = get_current_user()
+    profile_user = User.query.get_or_404(user_id)
+
+    # Redirect to own profile page if viewing yourself
+    if profile_user.id == current_user.id:
+        return redirect(url_for("profile"))
+
+    recipes = (
+        Recipe.query
+        .filter_by(author_id=profile_user.id)
+        .order_by(Recipe.created_at.desc())
+        .all()
+    )
+
+    recipe_count = len(recipes)
+    follower_count = Follow.query.filter_by(following_id=profile_user.id).count()
+    following_count = Follow.query.filter_by(follower_id=profile_user.id).count()
+
+    is_following = Follow.query.filter_by(
+        follower_id=current_user.id,
+        following_id=profile_user.id
+    ).first() is not None
+
+    return render_template(
+        "user_profile.html",
+        **user_context(current_user),
+        profile_user=profile_user,
+        recipes=recipes,
+        recipe_count=recipe_count,
+        follower_count=follower_count,
+        following_count=following_count,
+        is_following=is_following,
+    )
+
 
 ## -------- Forgot Password Page ---------------------------------------------
 @app.route("/forgot-password", methods=["GET", "POST"])

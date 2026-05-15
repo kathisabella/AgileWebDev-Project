@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ profile_user.display_name }} · Plateful{% endblock %}
+{% block body_class %}page-profile{% endblock %}
+
+{% block topbar %}
+<header class="topbar">
+  <div class="topbar-left">
+    <span class="hi">{{ profile_user.display_name }}</span>
+  </div>
+  <div class="topbar-right">
+    <a href="{{ url_for('upload_recipe') }}" class="btn-upload">+ New Recipe</a>
+  </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<div class="profile-header">
+  <div class="profile-top">
+    <div class="avatar-lg">{{ profile_user.display_name[:2].upper() }}</div>
+
+    <div class="profile-identity">
+      <h2>{{ profile_user.display_name }}</h2>
+      <p class="handle">@{{ profile_user.username }} · joined {{ profile_user.joined_date.strftime('%Y') if profile_user.joined_date else '' }}</p>
+      <p class="bio">{{ profile_user.bio or '' }}</p>
+    </div>
+
+    <div class="profile-actions">
+      {% if is_following %}
+      <form method="POST" action="{{ url_for('unfollow_user', user_id=profile_user.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="btn-edit">Following</button>
+      </form>
+      {% else %}
+      <form method="POST" action="{{ url_for('follow_user', user_id=profile_user.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="btn-follow">+ Follow</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+    <div class="profile-stats">
+    <div class="ps-item">
+      <p class="ps-value">{{ recipe_count }}</p>
+      <p class="ps-label">Recipes</p>
+    </div>
+    <div class="ps-item">
+      <p class="ps-value">{{ follower_count }}</p>
+      <p class="ps-label">Followers</p>
+    </div>
+    <div class="ps-item">
+      <p class="ps-value">{{ following_count }}</p>
+      <p class="ps-label">Following</p>
+    </div>
+  </div>
+</div>
+
+<div class="section-title" style="margin-top: 2rem;">
+  <h3>{{ profile_user.display_name }}'s recipes</h3>
+  <span style="font-size:0.78rem; color:var(--color-muted);">{{ recipe_count }} recipe{{ 's' if recipe_count != 1 else '' }}</span>
+</div>
+
+<div class="recipe-grid">
+  {% for recipe in recipes %}
+  <div class="recipe-card">
+    <div class="recipe-thumb">
+      {% if recipe.image_url %}
+      <img src="{{ url_for('static', filename=recipe.image_url) }}" alt="{{ recipe.title }}"/>
+      {% endif %}
+    </div>
+    <div class="recipe-body">
+      <p class="recipe-name">{{ recipe.title }}</p>
+      <div class="recipe-meta">
+        <span class="tag">{{ recipe.cuisine or '' }}</span>
+        <span>{{ recipe.difficulty or '' }}</span>
+        <span>{{ recipe.prep_time or '?' }} min</span>
+      </div>
+      <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+    </div>
+  </div>
+  {% else %}
+  <p class="empty-state">{{ profile_user.display_name }} hasn't posted any recipes yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

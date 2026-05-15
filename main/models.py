@@ -45,11 +45,11 @@ class Recipe(db.Model):
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     ## relationships
-    ingredients = db.relationship("Ingredient", backref="recipe", lazy=True)
-    steps = db.relationship("RecipeStep", backref="recipe", lazy=True)
-    saved_by = db.relationship("SavedRecipe", backref="recipe", lazy=True)
+    ingredients = db.relationship("Ingredient", backref="recipe", lazy=True, cascade="all, delete-orphan")
+    steps = db.relationship("RecipeStep", backref="recipe", lazy=True, cascade="all, delete-orphan")
+    saved_by = db.relationship("SavedRecipe", backref="recipe", lazy=True, cascade="all, delete-orphan")
     meal_plan_entries = db.relationship("MealPlanEntry", backref="recipe", lazy=True, cascade="all, delete-orphan")
-
+    
 class Ingredient(db.Model):
     __tablename__ = "ingredient"
 
