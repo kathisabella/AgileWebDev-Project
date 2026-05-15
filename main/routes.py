@@ -321,14 +321,10 @@ def following():
     following_ids = {row.following_id for row in following_rows}
 
     # Suggested: all users except yourself and those you already follow
-    suggested_users = (
-        User.query
-        .filter(User.id != user.id)
-        .filter(~User.id.in_(following_ids))
-        .order_by(func.random())
-        .limit(6)
-        .all()
-    )
+    base_query = User.query.filter(User.id != user.id)
+    if following_ids:
+        base_query = base_query.filter(~User.id.in_(following_ids))
+    suggested_users = base_query.order_by(func.random()).limit(6).all()
 
     return render_template(
         "following.html",
