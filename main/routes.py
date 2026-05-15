@@ -347,6 +347,11 @@ def follow_user(user_id):
         already = Follow.query.filter_by(follower_id=user.id, following_id=user_id).first()
         if not already:
             db.session.add(Follow(follower_id=user.id, following_id=user_id))
+            db.session.add(Activity(
+                user_id=user.id,
+                activity_type="followed_user",
+                related_user_id=user_id,
+            ))
             db.session.commit()
 
     return redirect(request.referrer or url_for("following"))
