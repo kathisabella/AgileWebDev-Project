@@ -29,31 +29,32 @@
 <div class="collections-row">
   <a href="{{ url_for('saved_recipes') }}" class="collection-chip active">
     All saved
-    <span class="chip-count">0</span>
+    <span class="chip-count">{{ saved_count }}</span>
   </a>
 </div>
 
 <div class="toolbar">
   <div class="toolbar-left">
     <span>Sort by</span>
-    <select class="sort-select">
-      <option>Recently saved</option>
-      <option>Most popular</option>
-      <option>Cook time</option>
-      <option>Rating</option>
+    <select id="sortSelect" class="sort-select">
+      <option value="recent">Recently saved</option>
+      <option value="cook_time">Cook time</option>
     </select>
   </div>
   <div class="view-toggle">
-    <button class="view-btn active">⊞ Grid</button>
-    <button class="view-btn">☰ List</button>
+    <button class="view-btn active" data-view="grid">⊞ Grid</button>
+    <button class="view-btn" data-view="list">☰ List</button>
   </div>
 </div>
 
-<div class="recipe-grid">
+<div id="recipesContainer" class="recipe-grid">
   {% for recipe in recipes %}
-  <div class="recipe-card">
+  <div class="recipe-card" data-index="{{ loop.index0 }}" data-cook-time="{{ recipe.prep_time }}">
+
     <div class="recipe-thumb">
-      {% if recipe.image_url %}<img src="{{ url_for('static', filename=recipe.image_url) }}" alt="{{ recipe.title }}"/>{% endif %}
+      {% if recipe.image_url %}
+        <img src="{{ url_for('static', filename=recipe.image_url) }}" alt="{{ recipe.title }}">
+      {% endif %}
     </div>
     <div class="recipe-body">
       <p class="recipe-name">{{ recipe.title }}</p>
@@ -62,11 +63,65 @@
         <span class="tag">{{ recipe.cuisine }}</span>
         <span>{{ recipe.prep_time }} min</span>
       </div>
-      <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+      <div class="recipe-actions">
+        <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+
+        <form
+          method="POST"
+          action="{{ url_for('unsave_recipe', recipe_id=recipe.id) }}"
+          class="delete-form"
+          onsubmit="return confirm('Delete this saved recipe?');"
+        >
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn delete-btn">Delete</button>
+        </form>
+      </div>
     </div>
   </div>
   {% else %}
   <p class="empty-state">No saved recipes yet.</p>
   {% endfor %}
 </div>
+
+<!-- Sort recipes -->
+<script>
+  const sortSelect = document.getElementById('sortSelect');
+  const recipesContainer = document.getElementById('recipesContainer');
+
+  sortSelect.addEventListener('change', () => {
+    const cards = Array.from(recipesContainer.querySelectorAll('.recipe-card'));
+
+    if (sortSelect.value === 'cook_time') {
+      cards.sort((a, b) => {
+        return Number(a.dataset.cookTime) - Number(b.dataset.cookTime);
+      });
+    } else {
+      cards.sort((a, b) => {
+        return Number(a.dataset.index) - Number(b.dataset.index);
+      });
+    }
+
+    cards.forEach(card => recipesContainer.appendChild(card));
+  });
+</script>
+
+<!-- grid and list toggle -->
+<script>
+  const viewButtons = document.querySelectorAll('.view-btn');
+
+  viewButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      viewButtons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+
+      if (button.dataset.view === 'list') {
+        recipesContainer.classList.remove('recipe-grid');
+        recipesContainer.classList.add('recipe-list');
+      } else {
+        recipesContainer.classList.remove('recipe-list');
+        recipesContainer.classList.add('recipe-grid');
+      }
+    });
+  });
+</script>
 {% endblock %}

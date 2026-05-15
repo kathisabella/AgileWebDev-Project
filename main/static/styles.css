@@ -323,11 +323,11 @@ body.page-meal-planner .page-intro h2 { font-size: 1.55rem; }
 .panel-header p { font-size: 0.74rem; color: var(--color-muted); margin-top: 2px; }
 
 .week-table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; min-width: 760px; }
+table { width: 100%; border-collapse: collapse; min-width: 760px; table-layout: fixed; }
 th, td { border-right: 1px solid #eee5cb; border-bottom: 1px solid #eee5cb; vertical-align: top; }
 th:last-child, td:last-child { border-right: none; }
 thead th { background: var(--color-surface-alt); padding: 14px 10px; text-align: left; font-size: 0.82rem; color: var(--color-text); font-weight: 700; }
-thead th:first-child { width: 98px; background: #f6f3e5; }
+thead th:first-child, .meal-label { width: 98px; min-width: 98px; max-width: 98px; background: #f6f3e5; }
 
 .meal-label { background: #faf6e6; padding: 14px 10px; font-weight: 700; font-size: 0.8rem; color: var(--color-text); width: 98px; }
 .meal-cell { padding: 12px; min-height: 136px; background: #fff; }
@@ -659,6 +659,27 @@ body.page-saved .recipe-card:nth-child(8) .recipe-thumb { background: #fde8d8; }
 .empty-state p { font-family: var(--font-head); font-size: 1rem; font-style: italic; margin-bottom: 8px; color: var(--color-text); }
 .empty-state small { font-size: 0.82rem; }
 
+.recipe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.recipe-list .recipe-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.recipe-list .recipe-thumb {
+  width: 140px;
+  height: 100px;
+  flex-shrink: 0;
+}
+
+.recipe-list .recipe-body {
+  flex: 1;
+}
 
 /* ════════════════════════════════════════════
    PAGE: DASHBOARD
@@ -1386,6 +1407,30 @@ body.page-saved .recipe-card:nth-child(8) .recipe-thumb { background: #fde8d8; }
 .empty-state p { font-family: var(--font-head); font-size: 1rem; font-style: italic; margin-bottom: 8px; color: var(--color-text); }
 .empty-state small { font-size: 0.82rem; }
 
+.recipe-actions {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-top: 12px;
+}
+
+.delete-form {
+  margin: 0;
+}
+
+.delete-btn {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.delete-btn:hover {
+  text-decoration: underline;
+}
 
 /* ════════════════════════════════════════════
    PAGE: DASHBOARD
@@ -1582,10 +1627,5 @@ body.page-profile .columns { display: grid; grid-template-columns: 1fr 260px; ga
 .logout-btn { width: 100%; padding: 8px 12px; background: none; border: 1.5px solid #d8d0b0; border-radius: 8px; font-family: var(--font-body); font-size: 0.82rem; font-weight: 600; color: var(--color-muted); cursor: pointer; text-align: left; transition: background 0.12s, color 0.12s; }
 .logout-btn:hover { background: #fdf0f0; border-color: #e8b0b0; color: #c0392b; }
 
-
-
-/* ════════════════════════════════════════════
-   PAGE: MEALPLANNER
-════════════════════════════════════════════ */
 
 
