@@ -708,13 +708,31 @@ def recipe_details(recipe_id):
     if redirect_response:
         return redirect_response
 
+    current_user = get_current_user()
     recipe = Recipe.query.get_or_404(recipe_id)
+
+    is_own_recipe = recipe.author_id == current_user.id
+
+    is_following_author = False
+    if not is_own_recipe:
+        is_following_author = Follow.query.filter_by(
+            follower_id=current_user.id,
+            following_id=recipe.author_id
+        ).first() is not None
+
+    is_saved = SavedRecipe.query.filter_by(
+        user_id=current_user.id,
+        recipe_id=recipe.id
+    ).first() is not None
 
     return render_template(
         "recipe_details.html",
-        **user_context(),
+        **user_context(current_user),
         recipe=recipe,
         recipe_id=recipe.id,
+        is_own_recipe=is_own_recipe,
+        is_following_author=is_following_author,
+        is_saved=is_saved,
     )
 
 ## -------- Edit Recipe Page ---------------------------------------------
