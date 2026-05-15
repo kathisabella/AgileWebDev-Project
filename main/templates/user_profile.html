@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ profile_user.display_name }} · Plateful{% endblock %}
+{% block body_class %}page-profile{% endblock %}
+
+{% block topbar %}
+<header class="topbar">
+  <div class="topbar-left">
+    <span class="hi">{{ profile_user.display_name }}</span>
+  </div>
+  <div class="topbar-right">
+    <a href="{{ url_for('upload_recipe') }}" class="btn-upload">+ New Recipe</a>
+  </div>
+</header>
+{% endblock %}
