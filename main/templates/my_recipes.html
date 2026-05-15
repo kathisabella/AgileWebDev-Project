@@ -10,7 +10,7 @@
     <span class="date">{{ page_date|default('') }}</span>
   </div>
   <div class="topbar-right">
-    <a href="{{ url_for('upload_recipe') }}" class="btn-upload">+ New Recipe</a>
+    <a href="{{ url_for('main.upload_recipe') }}" class="btn-upload">+ New Recipe</a>
   </div>
 </header>
 {% endblock %}

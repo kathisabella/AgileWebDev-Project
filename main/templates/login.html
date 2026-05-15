@@ -55,7 +55,7 @@
     </div>
 
     <div style="text-align:right; margin-top:-8px; margin-bottom:18px;">
-      <a href="{{ url_for('forgot_password') }}" style="font-size:0.78rem; color:var(--color-muted); font-weight:500;">Forgot password?</a>
+      <a href="{{ url_for('main.forgot_password') }}" style="font-size:0.78rem; color:var(--color-muted); font-weight:500;">Forgot password?</a>
     </div>
 
     <button type="submit" class="btn-submit">Sign in</button>
@@ -113,9 +113,9 @@
       <input id="su-terms" name="accept_terms" type="checkbox"/>
       <label for="su-terms">
         I agree to the
-        <a href="{{ url_for('terms') }}">Terms of Service</a>
+        <a href="{{ url_for('main.terms') }}">Terms of Service</a>
         and
-        <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+        <a href="{{ url_for('main.privacy') }}">Privacy Policy</a>
       </label>
     </div>
 

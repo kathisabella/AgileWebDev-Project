@@ -1,19 +1,25 @@
-from flask import Flask
-from flask import Config
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from main.config import Config
+from flask import Flask
+from flask_wtf.csrf import CSRFProtect
 
-app = Flask(__name__)
-app.config.from_object(Config)
+db = SQLAlchemy()
 
-db = SQLAlchemy(app)
-migration = Migrate(app, db)
-csrf = CSRFProtect(app)
-limiter = Limiter(get_remote_address, app=app, default_limits=[])
+csrf = CSRFProtect() 
 
-from main import routes
-from main import models
+def create_app(config):
+    app = Flask(__name__)
+    app.config.from_object(config)
+
+    db.init_app(app)
+
+    csrf.init_app(app)
+
+    from main.blueprints import main as main_blueprint
+    app.register_blueprint(main_blueprint)
+
+    return app

@@ -15,7 +15,7 @@
       <input type="text" placeholder="" />
     </div>
     <button class="notif-btn">🔔 <span class="notif-badge">0</span></button>
-    <a href="{{ url_for('upload_recipe') }}" class="btn-upload">+ New Recipe</a>
+    <a href="{{ url_for('main.upload_recipe') }}" class="btn-upload">+ New Recipe</a>
   </div>
 </header>
 {% endblock %}
@@ -38,7 +38,7 @@
     </div>
 
     <div class="profile-actions">
-      <a href="{{ url_for('settings') }}" class="btn-edit">Edit Profile</a>
+      <a href="{{ url_for('main.settings') }}" class="btn-edit">Edit Profile</a>
       <button class="btn-follow">+ Follow</button>
     </div>
   </div>
@@ -78,7 +78,7 @@
 <div class="tab-panel active" id="tab-recipes">
   <div class="section-title">
     <h3>My recipes</h3>
-    <a href="{{ url_for('upload_recipe') }}">+ New Recipe</a>
+    <a href="{{ url_for('main.upload_recipe') }}">+ New Recipe</a>
   </div>
   <div class="recipe-grid">
     {% for recipe in recipes %}
@@ -92,7 +92,7 @@
           <span class="tag">{{ recipe.cuisine or '' }}</span>
           <span>{{ recipe.prep_time or '?' }} min</span>
         </div>
-        <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+        <a href="{{ url_for('main.recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
       </div>
     </div>
     {% else %}
@@ -120,7 +120,7 @@
           <span class="tag">{{ recipe.cuisine or '' }}</span>
           <span>{{ recipe.prep_time or '?' }} min</span>
         </div>
-        <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+        <a href="{{ url_for('main.recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
       </div>
     </div>
     {% else %}

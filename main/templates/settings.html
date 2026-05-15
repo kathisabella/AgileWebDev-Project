@@ -16,7 +16,7 @@
 </div>
 
 <div class="form-card">
-  <form action="{{ url_for('settings') }}" method="post">
+  <form action="{{ url_for('main.settings') }}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <h1>Update your account</h1>
 
@@ -53,7 +53,7 @@
 
     <div class="actions">
       <button type="submit" class="btn save">Save Changes</button>
-      <a href="{{ url_for('profile') }}" class="btn" style="text-align:center;">Cancel</a>
+      <a href="{{ url_for('main.profile') }}" class="btn" style="text-align:center;">Cancel</a>
     </div>
   </form>
 </div>
