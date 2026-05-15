@@ -31,11 +31,13 @@
         {% if following %}
           {% for user in following %}
           <li class="follow-item">
-            <div class="avatar">{{ user.display_name[:2].upper() }}</div>
-            <div class="info">
-              <p class="uname">{{ user.display_name }}</p>
-              <p class="sub">{{ user.username }}</p>
-            </div>
+            <a href="{{ url_for('user_profile', user_id=user.id) }}" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.75rem; flex:1;">
+              <div class="avatar">{{ user.display_name[:2].upper() }}</div>
+              <div class="info">
+                <p class="uname">{{ user.display_name }}</p>
+                <p class="sub">@{{ user.username }}</p>
+              </div>
+            </a>
             <form method="POST" action="{{ url_for('unfollow_user', user_id=user.id) }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <button type="submit" class="btn-sm-follow">Following</button>
@@ -55,7 +57,25 @@
         <h3>Suggested accounts</h3>
       </div>
       <ul class="follow-list">
-        <p class="empty-state">No suggestions yet.</p>
+        {% if suggested_users %}
+          {% for u in suggested_users %}
+          <li class="follow-item">
+            <a href="{{ url_for('user_profile', user_id=u.id) }}" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.75rem; flex:1;">
+              <div class="avatar">{{ u.display_name[:2].upper() }}</div>
+              <div class="info">
+                <p class="uname">{{ u.display_name }}</p>
+                <p class="sub">@{{ u.username }}</p>
+              </div>
+            </a>
+            <form method="POST" action="{{ url_for('follow_user', user_id=u.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <button type="submit" class="btn-sm-follow">Follow</button>
+            </form>
+          </li>
+          {% endfor %}
+        {% else %}
+        <p class="empty-state">You're following everyone already!</p>
+        {% endif %}
       </ul>
     </section>
   </div>
