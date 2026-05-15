@@ -64,16 +64,20 @@
         <span>{{ recipe.prep_time or '?' }} min min</span>
       </div>
       <div class="recipe-actions">
-        <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
-
+        <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>       
         <form
           method="POST"
           action="{{ url_for('unsave_recipe', recipe_id=recipe.id) }}"
           class="delete-form"
-          onsubmit="return confirm('Delete this saved recipe?');"
         >
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="btn delete-btn">Delete</button>
+          <button
+            type="button"
+            class="btn delete-btn"
+            onclick="openDeleteModal(this, 'Delete this saved recipe?')"
+          >
+            Delete
+          </button>
         </form>
       </div>
     </div>
@@ -123,5 +127,45 @@
       }
     });
   });
+</script>
+
+
+<div id="deleteConfirmModal" class="delete-confirm-modal">
+  <div class="delete-confirm-box">
+    <h3>Confirm delete</h3>
+    <p id="deleteConfirmMessage">Delete this item?</p>
+
+    <div class="delete-confirm-actions">
+      <button type="button" class="btn cancel-delete-btn" onclick="closeDeleteModal()">
+        No
+      </button>
+
+      <button type="button" class="btn confirm-delete-btn" onclick="submitDeleteForm()">
+        Yes
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- modal for Delete button -->
+<script>
+  let selectedDeleteForm = null;
+
+  function openDeleteModal(button, message) {
+    selectedDeleteForm = button.closest('form');
+    document.getElementById('deleteConfirmMessage').textContent = message;
+    document.getElementById('deleteConfirmModal').style.display = 'flex';
+  }
+
+  function closeDeleteModal() {
+    selectedDeleteForm = null;
+    document.getElementById('deleteConfirmModal').style.display = 'none';
+  }
+
+  function submitDeleteForm() {
+    if (selectedDeleteForm) {
+      selectedDeleteForm.submit();
+    }
+  }
 </script>
 {% endblock %}
