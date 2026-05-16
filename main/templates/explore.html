@@ -19,7 +19,11 @@
 
 <div class="search-section">
   <div class="search-bar">
-    <input type="text" placeholder="" />
+    <input 
+      type="text" 
+      id="exploreRecipeSearch" 
+      placeholder="Search recipes..." 
+    />
   </div>
   <div class="filters">
     <div class="filter active">All</div>
@@ -46,7 +50,13 @@
   <div class="recipe-grid">
     {% if recipes %}
       {% for recipe in recipes %}
-      <div class="recipe-card">
+      <div 
+        class="recipe-card"
+        data-title="{{ recipe.title|lower }}"
+        data-author="{{ recipe.author.display_name|lower }}"
+        data-cuisine="{{ recipe.cuisine|default('', true)|lower }}"
+        data-difficulty="{{ recipe.difficulty|default('', true)|lower }}"
+      >
         <div class="recipe-thumb">
           {% if recipe.image_url %}
           <img src="{{ url_for('static', filename=recipe.image_url) }}" alt="{{ recipe.title }}"/>
@@ -70,4 +80,32 @@
   </div>
 </div>
 </div>
+
+
+<!-- Search explore recipes -->
+<script>
+  const exploreRecipeSearch = document.getElementById('exploreRecipeSearch');
+  const exploreRecipeCards = document.querySelectorAll('.recipe-card');
+
+  if (exploreRecipeSearch) {
+    exploreRecipeSearch.addEventListener('input', () => {
+      const keyword = exploreRecipeSearch.value.toLowerCase().trim();
+
+      exploreRecipeCards.forEach(card => {
+        const title = card.dataset.title || '';
+        const author = card.dataset.author || '';
+        const cuisine = card.dataset.cuisine || '';
+        const difficulty = card.dataset.difficulty || '';
+
+        const matchesSearch =
+          title.includes(keyword) ||
+          author.includes(keyword) ||
+          cuisine.includes(keyword) ||
+          difficulty.includes(keyword);
+
+        card.style.display = matchesSearch ? '' : 'none';
+      });
+    });
+  }
+</script>
 {% endblock %}

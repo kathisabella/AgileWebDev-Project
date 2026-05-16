@@ -813,6 +813,12 @@ def delete_recipe(recipe_id):
 
     if recipe.author_id != user.id:
         return redirect(url_for("dashboard"))
+    
+    # Delete related records first
+    Ingredient.query.filter_by(recipe_id=recipe.id).delete()
+    RecipeStep.query.filter_by(recipe_id=recipe.id).delete()
+    SavedRecipe.query.filter_by(recipe_id=recipe.id).delete()
+    Activity.query.filter_by(related_recipe_id=recipe.id).delete()
 
     Activity.query.filter_by(related_recipe_id=recipe.id).update( {"related_recipe_id": None} )
 
