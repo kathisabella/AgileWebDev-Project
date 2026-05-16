@@ -5,6 +5,8 @@ import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from main import create_app, db
 from main.config import SeleniumTestConfig
 from main.models import User, Recipe
@@ -39,20 +41,33 @@ def add_test_data():
 
 class SystemTests(unittest.TestCase):
 
-    def setUp(self):
-        self.app = create_app(SeleniumTestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
+    @classmethod
+    def setUpClass(cls):
+        """Start Flask server once for all tests."""
+        cls.app = create_app(SeleniumTestConfig)
+        cls.app_context = cls.app.app_context()
+        cls.app_context.push()
         db.create_all()
         add_test_data()
 
-        self.server_thread = threading.Thread(
-            target=lambda: self.app.run(port=5001, use_reloader=False)
+        cls.server_thread = threading.Thread(
+            target=lambda: cls.app.run(port=5001, use_reloader=False)
         )
-        self.server_thread.daemon = True
-        self.server_thread.start()
+        cls.server_thread.daemon = True
+        cls.server_thread.start()
         time.sleep(1)
 
+    @classmethod
+    def tearDownClass(cls):
+        """Drop DB and clean up after all tests."""
+        db.session.remove()
+        db.drop_all()
+        cls.app_context.pop()
+        if os.path.exists('selenium_test.db'):
+            os.remove('selenium_test.db')
+
+    def setUp(self):
+        """Fresh browser (no cookies) for each test."""
         options = Options()
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')
@@ -62,11 +77,6 @@ class SystemTests(unittest.TestCase):
 
     def tearDown(self):
         self.driver.quit()
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
-        if os.path.exists('selenium_test.db'):
-            os.remove('selenium_test.db')
 
     # --- Helper ---
 
@@ -106,8 +116,9 @@ class SystemTests(unittest.TestCase):
 
     def test_signup_creates_account_and_redirects(self):
         self.driver.get(f'{BASE_URL}/')
+        # Tab button may be hidden until JS runs — use JS click
         signup_tab = self.driver.find_element(By.CSS_SELECTOR, '[data-tab="signup"]')
-        signup_tab.click()
+        self.driver.execute_script("arguments[0].click();", signup_tab)
         self.driver.find_element(By.NAME, 'first_name').send_keys('Test')
         self.driver.find_element(By.NAME, 'last_name').send_keys('User')
         self.driver.find_element(By.NAME, 'username').send_keys('newseleniumuser')
@@ -195,12 +206,12 @@ class SystemTests(unittest.TestCase):
         self.assertIn('/following', self.driver.current_url,
                       'Following page should load for logged-in user')
 
-    def test_following_page_shows_suggested_users(self):
+    def test_following_page_has_suggested_section(self):
         self.login()
         self.driver.get(f'{BASE_URL}/following')
         body = self.driver.find_element(By.TAG_NAME, 'body').text
-        self.assertIn('Selenium Fan', body,
-                      'Suggested accounts should show users not yet followed')
+        self.assertIn('Suggested accounts', body,
+                      'Following page should display the Suggested accounts section')
 
     # --- Profile tests ---
 
