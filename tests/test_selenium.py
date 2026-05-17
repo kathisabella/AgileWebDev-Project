@@ -241,12 +241,13 @@ class SystemTests(unittest.TestCase):
         view_btn = self.driver.find_element(By.CSS_SELECTOR, '.recipe-card .btn')
         view_btn.click()
         WebDriverWait(self.driver, 10).until(EC.url_contains('/recipe/'))
-        save_btn = self.driver.find_element(By.CSS_SELECTOR, 'form[action$="/save"] button[type=submit]')
-        save_btn.click()
-        # Wait for page reload — unsave form only appears after save completes
-        WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, 'form[action$="/unsave"]'))
-        )
+        # Save only if not already saved — test_save_recipe may have run first
+        save_forms = self.driver.find_elements(By.CSS_SELECTOR, 'form[action$="/save"]')
+        if save_forms:
+            save_forms[0].find_element(By.CSS_SELECTOR, 'button[type=submit]').click()
+            WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, 'form[action$="/unsave"]'))
+            )
         self.driver.get(f'{BASE_URL}/saved')
         body = self.driver.find_element(By.TAG_NAME, 'body').text
         self.assertIn('Selenium Pasta', body,
@@ -272,7 +273,10 @@ class SystemTests(unittest.TestCase):
         self.driver.get(f'{BASE_URL}/following')
         follow_btn = self.driver.find_element(By.CSS_SELECTOR, 'form[action*="/follow/"] button[type=submit]')
         follow_btn.click()
-        WebDriverWait(self.driver, 10).until(EC.url_contains('/following'))
+        # Wait for page reload — unfollow form only appears after follow completes
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, 'form[action*="/unfollow/"]'))
+        )
         body = self.driver.find_element(By.TAG_NAME, 'body').text
         self.assertIn('Selenium Fan', body,
                       'Followed user should appear on the Following page after being followed')
