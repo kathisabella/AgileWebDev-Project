@@ -54,7 +54,7 @@
 
           {% else %}
 
-            <form action="{{ url_for('meal_planner_shuffle_day') }}" method="post">
+            <form action="{{ url_for('main.meal_planner_shuffle_day') }}" method="post">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
               <button type="submit" class="btn-solid">
@@ -82,7 +82,7 @@
                     <span>Day {{ loop.index }}</span>
 
                     {% if day in generated_days %}
-                      <form action="{{ url_for('meal_planner_delete_day') }}" method="post">
+                      <form action="{{ url_for('main.meal_planner_delete_day') }}" method="post">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="day" value="{{ day }}">
                         <button type="submit" class="delete-day-btn">
@@ -106,7 +106,7 @@
 
                 {% if recipe %}
                   <div class="meal-card {{ meal_type|lower }}">
-                    <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="meal-name meal-link">
+                    <a href="{{ url_for('main.recipe_details', recipe_id=recipe.id) }}" class="meal-name meal-link">
                       {{ recipe.name }}
                     </a>
                     <div class="meal-meta">
@@ -152,7 +152,7 @@
             <div class="mini-left">
               <div class="mini-icon">🍽️</div>
               <div>
-                <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="mini-name meal-link">
+                <a href="{{ url_for('main.recipe_details', recipe_id=recipe.id) }}" class="mini-name meal-link">
                   {{ recipe.name }}
                 </a>
                 <div class="mini-sub">{{ recipe.meal_type }} · {{ recipe.tag }}</div>
@@ -191,7 +191,7 @@
     <p>Do you really want to clear your current meal planner?</p>
 
     <div class="confirm-actions">
-      <form action="{{ url_for('meal_planner_clear_all') }}" method="post">
+      <form action="{{ url_for('main.meal_planner_clear_all') }}" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button type="submit" class="confirm-yes">
           Yes

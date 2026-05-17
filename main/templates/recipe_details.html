@@ -17,25 +17,25 @@
       <h1>{{ recipe.title|default('Recipe title') }}</h1>
       <div class="recipe-meta">
         {{ recipe.cuisine or 'Cuisine' }} · {{ recipe.prep_time or '?' }} minutes · {{ recipe.difficulty or 'Difficulty' }} ·
-        by <a href="{{ url_for('user_profile', user_id=recipe.author.id) }}" style="color:inherit; text-decoration:underline;">{{ recipe.author.display_name }}</a>
+        by <a href="{{ url_for('main.user_profile', user_id=recipe.author.id) }}" style="color:inherit; text-decoration:underline;">{{ recipe.author.display_name }}</a>
       </div>
     </div>
 
     <div class="actions">
       {% if not is_own_recipe %}
         {% if is_saved %}
-        <form action="{{ url_for('unsave_recipe', recipe_id=recipe_id) }}" method="post" style="display:inline;">
+        <form action="{{ url_for('main.unsave_recipe', recipe_id=recipe_id) }}" method="post" style="display:inline;">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <button type="submit" class="btn">Saved ✓</button>
         </form>
         {% else %}
-        <form action="{{ url_for('save_recipe', recipe_id=recipe_id) }}" method="post" style="display:inline;">
+        <form action="{{ url_for('main.save_recipe', recipe_id=recipe_id) }}" method="post" style="display:inline;">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <button type="submit" class="btn primary">Save</button>
         </form>
         {% endif %}
       {% else %}
-      <a href="{{ url_for('edit_recipe', recipe_id=recipe_id) }}" class="btn">Edit</a>
+      <a href="{{ url_for('main.edit_recipe', recipe_id=recipe_id) }}" class="btn">Edit</a>
       {% endif %}
     </div>
 
@@ -90,7 +90,7 @@
     <!-- Author card -->
     <div class="side-card">
       <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
-        <a href="{{ url_for('user_profile', user_id=recipe.author.id) }}" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.75rem;">
+        <a href="{{ url_for('main.user_profile', user_id=recipe.author.id) }}" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.75rem;">
           <div class="avatar">{{ recipe.author.display_name[:2].upper() }}</div>
           <div>
             <p style="font-weight:600; font-size:0.9rem;">{{ recipe.author.display_name }}</p>
@@ -103,12 +103,12 @@
       {% endif %}
       {% if not is_own_recipe %}
         {% if is_following_author %}
-        <form method="POST" action="{{ url_for('unfollow_user', user_id=recipe.author.id) }}">
+        <form method="POST" action="{{ url_for('main.unfollow_user', user_id=recipe.author.id) }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <button type="submit" class="btn" style="width:100%;">Following</button>
         </form>
         {% else %}
-        <form method="POST" action="{{ url_for('follow_user', user_id=recipe.author.id) }}">
+        <form method="POST" action="{{ url_for('main.follow_user', user_id=recipe.author.id) }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <button type="submit" class="btn primary" style="width:100%;">+ Follow</button>
         </form>

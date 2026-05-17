@@ -14,22 +14,22 @@
     <div class="wrapper">
 
       <aside class="sidebar">
-        <a href="{{ url_for('dashboard') }}" class="logo">
+        <a href="{{ url_for('main.dashboard') }}" class="logo">
           <h1>Plateful</h1>
           <p>your recipe space</p>
         </a>
 
         <nav>
           {% block sidebar_nav %}
-          <a href="{{ url_for('dashboard') }}"{% if request.endpoint == 'dashboard' %} class="active"{% endif %}>Home</a>
-          <a href="{{ url_for('explore') }}"{% if request.endpoint == 'explore' %} class="active"{% endif %}>Explore</a>
-          <a href="{{ url_for('my_recipes') }}"{% if request.endpoint == 'my_recipes' %} class="active"{% endif %}>My Recipes</a>
-          <a href="{{ url_for('saved_recipes') }}"{% if request.endpoint == 'saved_recipes' %} class="active"{% endif %}>Saved</a>
-          <a href="{{ url_for('following') }}"{% if request.endpoint == 'following' %} class="active"{% endif %}>Following</a>
-          <a href="{{ url_for('meal_planner') }}"{% if request.endpoint == 'meal_planner' %} class="active"{% endif %}>Meal Planner</a>
+          <a href="{{ url_for('main.dashboard') }}"{% if request.endpoint == 'dashboard' %} class="active"{% endif %}>Home</a>
+          <a href="{{ url_for('main.explore') }}"{% if request.endpoint == 'explore' %} class="active"{% endif %}>Explore</a>
+          <a href="{{ url_for('main.my_recipes') }}"{% if request.endpoint == 'my_recipes' %} class="active"{% endif %}>My Recipes</a>
+          <a href="{{ url_for('main.saved_recipes') }}"{% if request.endpoint == 'saved_recipes' %} class="active"{% endif %}>Saved</a>
+          <a href="{{ url_for('main.following') }}"{% if request.endpoint == 'following' %} class="active"{% endif %}>Following</a>
+          <a href="{{ url_for('main.meal_planner') }}"{% if request.endpoint == 'meal_planner' %} class="active"{% endif %}>Meal Planner</a>
           <hr class="nav-divider" />
-          <a href="{{ url_for('profile') }}"{% if request.endpoint == 'profile' %} class="active"{% endif %}>Profile</a>
-          <a href="{{ url_for('settings') }}"{% if request.endpoint == 'settings' %} class="active"{% endif %}>Settings</a>
+          <a href="{{ url_for('main.profile') }}"{% if request.endpoint == 'profile' %} class="active"{% endif %}>Profile</a>
+          <a href="{{ url_for('main.settings') }}"{% if request.endpoint == 'settings' %} class="active"{% endif %}>Settings</a>
           {% endblock %}
         </nav>
 
@@ -41,7 +41,7 @@
             <p class="handle">{{ username|default('@username') }}</p>
           </div>
         </div>
-          <form action="{{ url_for('logout') }}" method="post" class="logout-form">
+          <form action="{{ url_for('main.logout') }}" method="post" class="logout-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="logout-btn">Log out</button>
           </form>

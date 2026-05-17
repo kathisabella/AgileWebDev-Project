@@ -1697,5 +1697,85 @@ body.page-profile .columns { display: grid; grid-template-columns: 1fr 260px; ga
 .logout-btn { width: 100%; padding: 8px 12px; background: none; border: 1.5px solid #d8d0b0; border-radius: 8px; font-family: var(--font-body); font-size: 0.82rem; font-weight: 600; color: var(--color-muted); cursor: pointer; text-align: left; transition: background 0.12s, color 0.12s; }
 .logout-btn:hover { background: #fdf0f0; border-color: #e8b0b0; color: #c0392b; }
 
+/* ════════════════════════════════════════════
+   PAGE: MY RECIPES
+════════════════════════════════════════════ */
+
+body.page-my-recipes .recipe-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+body.page-my-recipes .recipe-thumb { height: 120px; }
+body.page-my-recipes .btn {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-sage);
+  background: #fff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.12s;
+}
+body.page-my-recipes .btn:hover { background: var(--color-surface-alt); text-decoration: none; }
+body.page-my-recipes .btn.delete-btn { color: var(--danger); border-color: #e8b0b0; }
+body.page-my-recipes .btn.delete-btn:hover { background: #fdf0f0; }
+
+/* ─── Delete confirm modal ─── */
+.delete-confirm-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.delete-confirm-box {
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px 32px;
+  max-width: 340px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+.delete-confirm-box h3 {
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+.delete-confirm-box p {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  margin-bottom: 22px;
+}
+.delete-confirm-actions { display: flex; gap: 10px; justify-content: center; }
+.cancel-delete-btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1.5px solid #d8d0b0;
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.cancel-delete-btn:hover { background: #e8e0cc; }
+.confirm-delete-btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: none;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.confirm-delete-btn:hover { opacity: 0.87; }
+
 
 

@@ -12,10 +12,9 @@
   <div class="topbar-right">
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
-      <input type="text" placeholder="Search recipes…" />
+      <input type="text" id="dashSearch" placeholder="Search recipes…" />
     </div>
-    <button class="notif-btn">🔔 <span class="notif-badge">0</span></button>
-    <a class="btn-upload" href="{{ url_for('upload_recipe') }}">+ New Recipe</a>
+    <a class="btn-upload" href="{{ url_for('main.upload_recipe') }}">+ New Recipe</a>
   </div>
 </header>
 {% endblock %}
@@ -54,7 +53,7 @@
     <section>
       <div class="section-title">
         <h3>Recently saved</h3>
-        <a href="{{ url_for('saved_recipes') }}">See all</a>
+        <a href="{{ url_for('main.saved_recipes') }}">See all</a>
       </div>
       <div class="recipe-grid">
         {% for recipe in recent_saved %}
@@ -69,9 +68,9 @@
             <p class="recipe-by">by {{ recipe.author.display_name }}</p>
             <div class="recipe-meta">
               <span class="tag">{{ recipe.cuisine or '' }}</span>
-              <span>{{ recipe.prep_time or '?' }} min min</span>
+              <span>{{ recipe.prep_time or '?' }} min</span>
             </div>
-            <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+            <a href="{{ url_for('main.recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
           </div>
         </div>
         {% else %}
@@ -83,12 +82,12 @@
     <section>
       <div class="section-title">
         <h3>Your top recipes</h3>
-        <a href="{{ url_for('my_recipes') }}">Manage</a>
+        <a href="{{ url_for('main.my_recipes') }}">Manage</a>
       </div>
       <ul class="pop-list">
         {% for item in top_recipes %}
         <li class="pop-item">
-          <a href="{{ url_for('recipe_details', recipe_id=item.recipe.id) }}" class="pop-title">{{ item.recipe.title }}</a>
+          <a href="{{ url_for('main.recipe_details', recipe_id=item.recipe.id) }}" class="pop-title">{{ item.recipe.title }}</a>
           <span class="pop-saves">{{ item.save_count }} save{{ 's' if item.save_count != 1 else '' }}</span>
         </li>
         {% else %}
@@ -118,7 +117,7 @@
     <section>
       <div class="section-title">
         <h3>People you follow</h3>
-        <a href="{{ url_for('following') }}">See all</a>
+        <a href="{{ url_for('main.following') }}">See all</a>
       </div>
       <ul class="follow-list">
         {% for u in followed_users %}
@@ -135,8 +134,24 @@
     <div class="weather-card">
       <p class="w-top">Tip of the day</p>
       <p class="w-msg">{{ tip }}</p>
-      <a href="{{ url_for('explore') }}">Browse recipes →</a>
+      <a href="{{ url_for('main.explore') }}">Browse recipes →</a>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const dashSearch = document.getElementById('dashSearch');
+  if (dashSearch) {
+    dashSearch.addEventListener('input', () => {
+      const keyword = dashSearch.value.toLowerCase().trim();
+      document.querySelectorAll('.recipe-card').forEach(card => {
+        const title = (card.querySelector('.recipe-name')?.textContent || '').toLowerCase();
+        const author = (card.querySelector('.recipe-by')?.textContent || '').toLowerCase();
+        card.style.display = (title.includes(keyword) || author.includes(keyword)) ? '' : 'none';
+      });
+    });
+  }
+</script>
 {% endblock %}

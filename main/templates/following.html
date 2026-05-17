@@ -10,7 +10,7 @@
     <span class="date">{{ page_date|default('') }}</span>
   </div>
   <div class="topbar-right">
-    <a href="{{ url_for('upload_recipe') }}" class="btn-upload">+ New Recipe</a>
+    <a href="{{ url_for('main.upload_recipe') }}" class="btn-upload">+ New Recipe</a>
   </div>
 </header>
 {% endblock %}
@@ -31,14 +31,14 @@
         {% if following %}
           {% for user in following %}
           <li class="follow-item">
-            <a href="{{ url_for('user_profile', user_id=user.id) }}" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.75rem; flex:1;">
+            <a href="{{ url_for('main.user_profile', user_id=user.id) }}" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.75rem; flex:1;">
               <div class="avatar">{{ user.display_name[:2].upper() }}</div>
               <div class="info">
                 <p class="uname">{{ user.display_name }}</p>
                 <p class="sub">@{{ user.username }}</p>
               </div>
             </a>
-            <form method="POST" action="{{ url_for('unfollow_user', user_id=user.id) }}">
+            <form method="POST" action="{{ url_for('main.unfollow_user', user_id=user.id) }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <button type="submit" class="btn-sm-follow">Following</button>
             </form>
@@ -60,14 +60,14 @@
         {% if suggested_users %}
           {% for u in suggested_users %}
           <li class="follow-item">
-            <a href="{{ url_for('user_profile', user_id=u.id) }}" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.75rem; flex:1;">
+            <a href="{{ url_for('main.user_profile', user_id=u.id) }}" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.75rem; flex:1;">
               <div class="avatar">{{ u.display_name[:2].upper() }}</div>
               <div class="info">
                 <p class="uname">{{ u.display_name }}</p>
                 <p class="sub">@{{ u.username }}</p>
               </div>
             </a>
-            <form method="POST" action="{{ url_for('follow_user', user_id=u.id) }}">
+            <form method="POST" action="{{ url_for('main.follow_user', user_id=u.id) }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <button type="submit" class="btn-sm-follow">Follow</button>
             </form>

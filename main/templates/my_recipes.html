@@ -10,7 +10,7 @@
     <span class="date">{{ page_date|default('') }}</span>
   </div>
   <div class="topbar-right">
-    <a href="{{ url_for('upload_recipe') }}" class="btn-upload">+ New Recipe</a>
+    <a href="{{ url_for('main.upload_recipe') }}" class="btn-upload">+ New Recipe</a>
   </div>
 </header>
 {% endblock %}
@@ -24,20 +24,28 @@
 <div class="toolbar">
   <div class="toolbar-left">
     <span>Sort by</span>
-    <select class="sort-select">
-      <option>Most recent</option>
-      <option>Oldest</option>
-      <option>Most saved</option>
-      <option>Alphabetical</option>
+    <select id="myRecipesSort" class="sort-select">
+      <option value="recent">Most recent</option>
+      <option value="oldest">Oldest</option>
+      <option value="saves">Most saved</option>
+      <option value="alpha">Alphabetical</option>
     </select>
   </div>
 </div>
 
-<div class="recipe-grid">
+<div id="myRecipesGrid" class="recipe-grid">
   {% if recipes %}
     {% for recipe in recipes %}
-    <div class="recipe-card">
-      <div class="recipe-thumb"></div>
+    <div class="recipe-card"
+      data-index="{{ loop.index0 }}"
+      data-title="{{ recipe.title|lower }}"
+      data-saves="{{ recipe.saved_by | length }}"
+    >
+      <div class="recipe-thumb">
+        {% if recipe.image_url %}
+        <img src="{{ url_for('static', filename=recipe.image_url) }}" alt="{{ recipe.title }}"/>
+        {% endif %}
+      </div>
       <div class="recipe-body">
         <p class="recipe-name">{{ recipe.title }}</p>
         <p class="recipe-by">Created by you</p>
@@ -51,17 +59,12 @@
           {% endif %}
         </div>
         <div class="actions" style="margin-top: 12px;">
-          <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
-          <a href="{{ url_for('edit_recipe', recipe_id=recipe.id) }}" class="btn">Edit</a>         
-          <form method="POST" action="{{ url_for('delete_recipe', recipe_id=recipe.id) }}">
+          <a href="{{ url_for('main.recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+          <a href="{{ url_for('main.edit_recipe', recipe_id=recipe.id) }}" class="btn">Edit</a>
+          <form method="POST" action="{{ url_for('main.delete_recipe', recipe_id=recipe.id) }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <button
-              type="button"
-              class="btn delete-btn"
-              onclick="openDeleteModal(this, 'Delete this recipe?')"
-            >
-              Delete
-            </button>
+            <button type="button" class="btn delete-btn"
+              onclick="openDeleteModal(this, 'Delete this recipe?')">Delete</button>
           </form>
         </div>
       </div>
@@ -72,24 +75,33 @@
   {% endif %}
 </div>
 
-<!-- confirmation modal for Delete button -->
- <div id="deleteConfirmModal" class="delete-confirm-modal">
+<div id="deleteConfirmModal" class="delete-confirm-modal">
   <div class="delete-confirm-box">
     <h3>Confirm delete</h3>
     <p id="deleteConfirmMessage">Delete this recipe?</p>
-
     <div class="delete-confirm-actions">
-      <button type="button" class="btn cancel-delete-btn" onclick="closeDeleteModal()">
-        No
-      </button>
-
-      <button type="button" class="btn confirm-delete-btn" onclick="submitDeleteForm()">
-        Yes
-      </button>
+      <button type="button" class="btn cancel-delete-btn" onclick="closeDeleteModal()">No</button>
+      <button type="button" class="btn confirm-delete-btn" onclick="submitDeleteForm()">Yes</button>
     </div>
   </div>
 </div>
+
 <script>
+  const myRecipesSort = document.getElementById('myRecipesSort');
+  const myRecipesGrid = document.getElementById('myRecipesGrid');
+
+  myRecipesSort.addEventListener('change', () => {
+    const cards = Array.from(myRecipesGrid.querySelectorAll('.recipe-card'));
+    const val = myRecipesSort.value;
+    cards.sort((a, b) => {
+      if (val === 'recent') return Number(a.dataset.index) - Number(b.dataset.index);
+      if (val === 'oldest') return Number(b.dataset.index) - Number(a.dataset.index);
+      if (val === 'saves')  return Number(b.dataset.saves) - Number(a.dataset.saves);
+      if (val === 'alpha')  return a.dataset.title.localeCompare(b.dataset.title);
+    });
+    cards.forEach(card => myRecipesGrid.appendChild(card));
+  });
+
   let selectedDeleteForm = null;
 
   function openDeleteModal(button, message) {
@@ -104,9 +116,7 @@
   }
 
   function submitDeleteForm() {
-    if (selectedDeleteForm) {
-      selectedDeleteForm.submit();
-    }
+    if (selectedDeleteForm) selectedDeleteForm.submit();
   }
 </script>
 {% endblock %}

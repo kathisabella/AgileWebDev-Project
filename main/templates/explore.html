@@ -7,7 +7,7 @@
 <header class="topbar">
   <div>Explore Recipes</div>
   <div class="topbar-right">
-    <a class="btn-upload" href="{{ url_for('upload_recipe') }}">+ New Recipe</a>
+    <a class="btn-upload" href="{{ url_for('main.upload_recipe') }}">+ New Recipe</a>
   </div>
 </header>
 {% endblock %}
@@ -19,17 +19,11 @@
 
 <div class="search-section">
   <div class="search-bar">
-    <input 
-      type="text" 
-      id="exploreRecipeSearch" 
-      placeholder="Search recipes..." 
-    />
+    <input type="text" id="exploreSearch" placeholder="Search recipes..." />
   </div>
   <div class="filters">
-    <div class="filter active">All</div>
-    <div class="filter">Quick meals</div>
-    <div class="filter">Healthy</div>
-    <div class="filter">Comfort food</div>
+    <div class="filter active" data-chip="all">All</div>
+    <div class="filter" data-chip="quick">Quick meals</div>
   </div>
 </div>
 
@@ -37,75 +31,112 @@
   <div class="filter-panel">
     <div class="filter-group">
       <h4>Cuisine</h4>
+      <select id="cuisineFilter" class="sort-select" style="width:100%; margin-top:6px;">
+        <option value="">All</option>
+        {% set seen = namespace(cuisines=[]) %}
+        {% for recipe in recipes %}
+          {% if recipe.cuisine and recipe.cuisine not in seen.cuisines %}
+            {% set seen.cuisines = seen.cuisines + [recipe.cuisine] %}
+            <option value="{{ recipe.cuisine|lower }}">{{ recipe.cuisine }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
     </div>
     <div class="filter-group">
       <h4>Difficulty</h4>
-    </div>
-    <div class="filter-group">
-      <h4>Ingredients</h4>
+      <select id="difficultyFilter" class="sort-select" style="width:100%; margin-top:6px;">
+        <option value="">All</option>
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
     </div>
   </div>
 
-<div>
-  <div class="recipe-grid">
-    {% if recipes %}
-      {% for recipe in recipes %}
-      <div 
-        class="recipe-card"
-        data-title="{{ recipe.title|lower }}"
-        data-author="{{ recipe.author.display_name|lower }}"
-        data-cuisine="{{ recipe.cuisine|default('', true)|lower }}"
-        data-difficulty="{{ recipe.difficulty|default('', true)|lower }}"
-      >
-        <div class="recipe-thumb">
-          {% if recipe.image_url %}
-          <img src="{{ url_for('static', filename=recipe.image_url) }}" alt="{{ recipe.title }}"/>
-          {% endif %}
-        </div>
-        <div class="recipe-body">
-          <p class="recipe-name">{{ recipe.title }}</p>
-          <p class="recipe-by">by <a href="{{ url_for('user_profile', user_id=recipe.author.id) }}" style="color:inherit; text-decoration:underline;">{{ recipe.author.display_name }}</a></p>
-          <div class="recipe-meta">
-            <span class="tag">{{ recipe.cuisine or '' }}</span>
-            <span>{{ recipe.difficulty or '' }}</span>
-            <span>{{ recipe.prep_time or '?' }} min</span>
+  <div>
+    <div id="exploreGrid" class="recipe-grid">
+      {% if recipes %}
+        {% for recipe in recipes %}
+        <div class="recipe-card"
+          data-title="{{ recipe.title|lower }}"
+          data-author="{{ recipe.author.display_name|lower }}"
+          data-cuisine="{{ recipe.cuisine|default('', true)|lower }}"
+          data-difficulty="{{ recipe.difficulty|default('', true)|lower }}"
+          data-prep-time="{{ recipe.prep_time or 0 }}"
+        >
+          <div class="recipe-thumb">
+            {% if recipe.image_url %}
+            <img src="{{ url_for('static', filename=recipe.image_url) }}" alt="{{ recipe.title }}"/>
+            {% endif %}
           </div>
-          <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+          <div class="recipe-body">
+            <p class="recipe-name">{{ recipe.title }}</p>
+            <p class="recipe-by">by <a href="{{ url_for('main.user_profile', user_id=recipe.author.id) }}" style="color:inherit; text-decoration:underline;">{{ recipe.author.display_name }}</a></p>
+            <div class="recipe-meta">
+              <span class="tag">{{ recipe.cuisine or '' }}</span>
+              <span>{{ recipe.difficulty or '' }}</span>
+              <span>{{ recipe.prep_time or '?' }} min</span>
+            </div>
+            <a href="{{ url_for('main.recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+          </div>
         </div>
-      </div>
-      {% endfor %}
-    {% else %}
-      <p class="empty-state">No recipes yet. Be the first to upload one!</p>
-    {% endif %}
+        {% endfor %}
+      {% else %}
+        <p class="empty-state">No recipes yet. Be the first to upload one!</p>
+      {% endif %}
+    </div>
   </div>
 </div>
-</div>
 
-
-<!-- Search explore recipes -->
 <script>
-  const exploreRecipeSearch = document.getElementById('exploreRecipeSearch');
-  const exploreRecipeCards = document.querySelectorAll('.recipe-card');
+  const exploreSearch = document.getElementById('exploreSearch');
+  const cuisineFilter = document.getElementById('cuisineFilter');
+  const difficultyFilter = document.getElementById('difficultyFilter');
+  const chips = document.querySelectorAll('.filter');
+  let activeChip = 'all';
 
-  if (exploreRecipeSearch) {
-    exploreRecipeSearch.addEventListener('input', () => {
-      const keyword = exploreRecipeSearch.value.toLowerCase().trim();
+  function applyFilters() {
+    const keyword = exploreSearch.value.toLowerCase().trim();
+    const cuisine = cuisineFilter.value;
+    const difficulty = difficultyFilter.value;
 
-      exploreRecipeCards.forEach(card => {
-        const title = card.dataset.title || '';
-        const author = card.dataset.author || '';
-        const cuisine = card.dataset.cuisine || '';
-        const difficulty = card.dataset.difficulty || '';
+    document.querySelectorAll('#exploreGrid .recipe-card').forEach(card => {
+      const prepTime = parseInt(card.dataset.prepTime) || 0;
+      const cardCuisine = card.dataset.cuisine || '';
+      const cardDifficulty = card.dataset.difficulty || '';
 
-        const matchesSearch =
-          title.includes(keyword) ||
-          author.includes(keyword) ||
-          cuisine.includes(keyword) ||
-          difficulty.includes(keyword);
+      const matchesSearch = !keyword ||
+        (card.dataset.title || '').includes(keyword) ||
+        (card.dataset.author || '').includes(keyword) ||
+        cardCuisine.includes(keyword) ||
+        cardDifficulty.includes(keyword);
 
-        card.style.display = matchesSearch ? '' : 'none';
-      });
+      const matchesCuisine = !cuisine || cardCuisine === cuisine;
+      const matchesDifficulty = !difficulty || cardDifficulty === difficulty;
+
+      let matchesChip = true;
+      if (activeChip === 'quick')   matchesChip = prepTime > 0 && prepTime <= 20;
+      else if (activeChip === 'healthy')  matchesChip = cardDifficulty === 'easy';
+      else if (activeChip === 'comfort')  matchesChip = prepTime > 30;
+
+      card.style.display =
+        (matchesSearch && matchesCuisine && matchesDifficulty && matchesChip) ? '' : 'none';
     });
   }
+
+  exploreSearch.addEventListener('input', applyFilters);
+  cuisineFilter.addEventListener('change', applyFilters);
+  difficultyFilter.addEventListener('change', applyFilters);
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeChip = chip.dataset.chip;
+      cuisineFilter.value = '';
+      difficultyFilter.value = '';
+      applyFilters();
+    });
+  });
 </script>
 {% endblock %}
