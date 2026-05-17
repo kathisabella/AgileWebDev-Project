@@ -12,9 +12,8 @@
   <div class="topbar-right">
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
-      <input type="text" placeholder="Search recipes…" />
+      <input type="text" id="dashSearch" placeholder="Search recipes…" />
     </div>
-    <button class="notif-btn">🔔 <span class="notif-badge">0</span></button>
     <a class="btn-upload" href="{{ url_for('main.upload_recipe') }}">+ New Recipe</a>
   </div>
 </header>
@@ -69,7 +68,7 @@
             <p class="recipe-by">by {{ recipe.author.display_name }}</p>
             <div class="recipe-meta">
               <span class="tag">{{ recipe.cuisine or '' }}</span>
-              <span>{{ recipe.prep_time or '?' }} min min</span>
+              <span>{{ recipe.prep_time or '?' }} min</span>
             </div>
             <a href="{{ url_for('main.recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
           </div>
@@ -139,4 +138,20 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const dashSearch = document.getElementById('dashSearch');
+  if (dashSearch) {
+    dashSearch.addEventListener('input', () => {
+      const keyword = dashSearch.value.toLowerCase().trim();
+      document.querySelectorAll('.recipe-card').forEach(card => {
+        const title = (card.querySelector('.recipe-name')?.textContent || '').toLowerCase();
+        const author = (card.querySelector('.recipe-by')?.textContent || '').toLowerCase();
+        card.style.display = (title.includes(keyword) || author.includes(keyword)) ? '' : 'none';
+      });
+    });
+  }
+</script>
 {% endblock %}
