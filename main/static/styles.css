@@ -681,6 +681,76 @@ body.page-saved .recipe-card:nth-child(8) .recipe-thumb { background: #fde8d8; }
   flex: 1;
 }
 
+/* ─── Delete confirmation modal ─── */
+.delete-confirm-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(58, 50, 36, 0.45);
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.delete-confirm-box {
+  width: 360px;
+  max-width: 90%;
+  background: #fff;
+  border: 1px solid #ddd4b8;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 12px 30px rgba(58, 50, 36, 0.18);
+}
+
+.delete-confirm-box h3 {
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: var(--color-text);
+}
+
+.delete-confirm-box p {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  margin-bottom: 18px;
+}
+
+.delete-confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.cancel-delete-btn,
+.confirm-delete-btn {
+  border: 1px solid #d8d0b0;
+  border-radius: 10px;
+  padding: 8px 18px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancel-delete-btn {
+  background: #fff;
+  color: var(--color-text);
+}
+
+.confirm-delete-btn {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+
+.cancel-delete-btn:hover {
+  background: #fff8da;
+}
+
+.confirm-delete-btn:hover {
+  opacity: 0.9;
+}
+
 /* ════════════════════════════════════════════
    PAGE: DASHBOARD
 ════════════════════════════════════════════ */

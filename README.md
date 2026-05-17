@@ -22,6 +22,14 @@ Plateful is a web-based recipe-sharing platform that provides a seamless and enj
 
 ---
 
+## Python version
+
+This project is built and tested with Python 3.12.
+
+Python 3.14 is not recommended because some dependencies, such as `greenlet`, may not work correctly with the newest Python version.
+
+---
+
 ## Getting Started
 
 ### 1. Clone the repository
@@ -33,22 +41,24 @@ cd Plateful-AgileWD-Project-2026
 
 ### 2. Create and activate a virtual environment
 
+This project should be run with Python 3.12.
+
 **macOS / Linux**
 ```bash
-python3 -m venv venv
+python3.12 -m venv venv
 source venv/bin/activate
 ```
 
 **Windows (PowerShell)**
 ```powershell
-python -m venv venv
+py -3.12 -m venv venv
 .\venv\Scripts\Activate.ps1
 ```
 
 ### 3. Install dependencies
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 ### 4. Set up environment variables

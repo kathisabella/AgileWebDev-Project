@@ -12,7 +12,11 @@
   <div class="topbar-right">
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
-      <input type="text" placeholder="" />
+      <input 
+        type="text" 
+        id="savedRecipeSearch"
+        placeholder="Search saved recipes..." 
+      />
     </div>
     <button class="notif-btn">🔔 <span class="notif-badge">0</span></button>
     <a href="{{ url_for('main.upload_recipe') }}" class="btn-upload">+ New Recipe</a>
@@ -49,7 +53,14 @@
 
 <div id="recipesContainer" class="recipe-grid">
   {% for recipe in recipes %}
-  <div class="recipe-card" data-index="{{ loop.index0 }}" data-cook-time="{{ recipe.prep_time }}">
+  <div 
+    class="recipe-card" 
+    data-index="{{ loop.index0 }}" 
+    data-cook-time="{{ recipe.prep_time }}"
+    data-title="{{ recipe.title|lower }}"
+    data-author="{{ recipe.author.display_name|lower }}"
+    data-cuisine="{{ recipe.cuisine|default('', true)|lower }}"
+  >
 
     <div class="recipe-thumb">
       {% if recipe.image_url %}
@@ -61,7 +72,7 @@
       <p class="recipe-by">by {{ recipe.author.display_name }}</p>
       <div class="recipe-meta">
         <span class="tag">{{ recipe.cuisine or '' }}</span>
-        <span>{{ recipe.prep_time or '?' }} min min</span>
+        <span>{{ recipe.prep_time or '?' }} min</span>
       </div>
       <div class="recipe-actions">
         <a href="{{ url_for('main.recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
@@ -70,10 +81,15 @@
           method="POST"
           action="{{ url_for('main.unsave_recipe', recipe_id=recipe.id) }}"
           class="delete-form"
-          onsubmit="return confirm('Delete this saved recipe?');"
         >
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="btn delete-btn">Delete</button>
+          <button
+            type="button"
+            class="btn delete-btn"
+            onclick="openDeleteModal(this, 'Delete this saved recipe?')"
+          >
+            Delete
+          </button>
         </form>
       </div>
     </div>
@@ -123,5 +139,69 @@
       }
     });
   });
+</script>
+
+<!-- Search saved recipes -->
+<script>
+  const savedRecipeSearch = document.getElementById('savedRecipeSearch');
+
+  if (savedRecipeSearch) {
+    savedRecipeSearch.addEventListener('input', () => {
+      const keyword = savedRecipeSearch.value.toLowerCase().trim();
+      const cards = recipesContainer.querySelectorAll('.recipe-card');
+
+      cards.forEach(card => {
+        const title = card.dataset.title || '';
+        const author = card.dataset.author || '';
+        const cuisine = card.dataset.cuisine || '';
+
+        const matchesSearch =
+          title.includes(keyword) ||
+          author.includes(keyword) ||
+          cuisine.includes(keyword);
+
+        card.style.display = matchesSearch ? '' : 'none';
+      });
+    });
+  }
+</script>
+
+
+<!--confirming modal for Delete button -->
+<div id="deleteConfirmModal" class="delete-confirm-modal">
+  <div class="delete-confirm-box">
+    <h3>Confirm delete</h3>
+    <p id="deleteConfirmMessage">Delete this item?</p>
+
+    <div class="delete-confirm-actions">
+      <button type="button" class="btn cancel-delete-btn" onclick="closeDeleteModal()">
+        No
+      </button>
+
+      <button type="button" class="btn confirm-delete-btn" onclick="submitDeleteForm()">
+        Yes
+      </button>
+    </div>
+  </div>
+</div>
+<script>
+  let selectedDeleteForm = null;
+
+  function openDeleteModal(button, message) {
+    selectedDeleteForm = button.closest('form');
+    document.getElementById('deleteConfirmMessage').textContent = message;
+    document.getElementById('deleteConfirmModal').style.display = 'flex';
+  }
+
+  function closeDeleteModal() {
+    selectedDeleteForm = null;
+    document.getElementById('deleteConfirmModal').style.display = 'none';
+  }
+
+  function submitDeleteForm() {
+    if (selectedDeleteForm) {
+      selectedDeleteForm.submit();
+    }
+  }
 </script>
 {% endblock %}
