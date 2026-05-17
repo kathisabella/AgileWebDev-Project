@@ -64,11 +64,11 @@
         <span>{{ recipe.prep_time or '?' }} min min</span>
       </div>
       <div class="recipe-actions">
-        <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
+        <a href="{{ url_for('main.recipe_details', recipe_id=recipe.id) }}" class="btn">View</a>
 
         <form
           method="POST"
-          action="{{ url_for('unsave_recipe', recipe_id=recipe.id) }}"
+          action="{{ url_for('main.unsave_recipe', recipe_id=recipe.id) }}"
           class="delete-form"
           onsubmit="return confirm('Delete this saved recipe?');"
         >

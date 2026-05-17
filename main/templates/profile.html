@@ -14,7 +14,6 @@
       <span class="search-icon">🔍</span>
       <input type="text" placeholder="" />
     </div>
-    <button class="notif-btn">🔔 <span class="notif-badge">0</span></button>
     <a href="{{ url_for('main.upload_recipe') }}" class="btn-upload">+ New Recipe</a>
   </div>
 </header>
@@ -39,7 +38,6 @@
 
     <div class="profile-actions">
       <a href="{{ url_for('main.settings') }}" class="btn-edit">Edit Profile</a>
-      <button class="btn-follow">+ Follow</button>
     </div>
   </div>
 
@@ -179,15 +177,14 @@
             <div class="avatar">{{ f.initials|default('--') }}</div>
             <div class="info">
               <p class="uname">{{ f.username }}</p>
-              <p class="sub">{{ f.subtitle|default('') }}</p>
             </div>
             {% if f.is_following %}
-            <form method="POST" action="{{ url_for('unfollow_user', user_id=f.id) }}">
+            <form method="POST" action="{{ url_for('main.unfollow_user', user_id=f.id) }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <button type="submit" class="btn-sm-follow">Following</button>
             </form>
             {% else %}
-            <form method="POST" action="{{ url_for('follow_user', user_id=f.id) }}">
+            <form method="POST" action="{{ url_for('main.follow_user', user_id=f.id) }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <button type="submit" class="btn-sm-follow">Follow back</button>
             </form>
@@ -215,9 +212,8 @@
             <div class="avatar">{{ f.initials|default('--') }}</div>
             <div class="info">
               <p class="uname">{{ f.username }}</p>
-              <p class="sub">{{ f.subtitle|default('') }}</p>
             </div>
-            <form method="POST" action="{{ url_for('unfollow_user', user_id=f.id) }}">
+            <form method="POST" action="{{ url_for('main.unfollow_user', user_id=f.id) }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <button type="submit" class="btn-sm-follow">Following</button>
             </form>
