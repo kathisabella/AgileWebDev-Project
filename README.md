@@ -170,8 +170,8 @@ Plateful-AgileWD-Project-2026/
 │       ├── upload_recipe.html
 │       └── user_profile.html
 ├── tests
-│   ├── test_unit.py         ← 22 unit tests (in-memory SQLite)
-│   └── test_selenium.py     ← 6 Selenium end-to-end tests
+│   ├── test_unit.py         ← 24 unit tests (in-memory SQLite)
+│   └── test_selenium.py     ← 21 Selenium end-to-end tests
 ├── Testing.md
 ├── README.md
 └── requirements.txt
