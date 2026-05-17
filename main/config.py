@@ -12,11 +12,13 @@ class DeploymentConfig(Config):
         'sqlite:///' + os.path.join(basedir, 'plateful.db')
 
 class TestConfig(Config):
+    SECRET_KEY = 'unit-test-secret-key'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     TESTING = True
     WTF_CSRF_ENABLED = False
 
 class SeleniumTestConfig(Config):
+    SECRET_KEY = 'selenium-test-secret-key'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///selenium_test.db'
     TESTING = True
     WTF_CSRF_ENABLED = False

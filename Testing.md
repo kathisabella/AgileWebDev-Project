@@ -28,7 +28,7 @@ python -m pytest tests/test_selenium.py -v
 
 ## Automated Unit Tests (`tests/test_unit.py`)
 
-All 22 tests use an in-memory SQLite database (`sqlite:///:memory:`) via `TestConfig`.
+All 24 tests use an in-memory SQLite database (`sqlite:///:memory:`) via `TestConfig`.
 Each test class creates a fresh DB in `setUp` and drops it in `tearDown`.
 
 ### Password & Authentication
@@ -94,17 +94,50 @@ Each test class creates a fresh DB in `setUp` and drops it in `tearDown`.
 
 ## Automated Selenium Tests (`tests/test_selenium.py`)
 
-All 6 tests use a file-based SQLite DB (`sqlite:///selenium_test.db`) via `SeleniumTestConfig`.
+All 17 tests use a file-based SQLite DB (`sqlite:///selenium_test.db`) via `SeleniumTestConfig`.
 Flask runs on a daemon thread at `http://localhost:5001`. Chrome runs headless.
+
+### Authentication
 
 | Test | Description | Expected |
 |------|-------------|----------|
 | `test_login_page_loads` | Navigate to `/` | Page title contains `'Plateful'` |
 | `test_valid_login_redirects_to_dashboard` | Login with valid credentials | URL contains `/dashboard` |
 | `test_invalid_login_shows_error` | Login with wrong password | Error element visible on page |
-| `test_explore_requires_login` | Navigate to `/explore` without login | Redirected to `/` |
-| `test_explore_shows_recipes_after_login` | Login then visit `/explore` | At least 1 recipe card visible |
 | `test_logout_redirects_to_login` | Click logout | Redirected to `/` |
+| `test_signup_creates_account_and_redirects` | Complete signup form | URL contains `/dashboard` |
+
+### Auth Guards (unauthenticated access)
+
+| Test | Description | Expected |
+|------|-------------|----------|
+| `test_explore_requires_login` | Navigate to `/explore` without login | Redirected to `/` |
+| `test_dashboard_requires_login` | Navigate to `/dashboard` without login | Redirected to `/` |
+| `test_profile_requires_login` | Navigate to `/profile` without login | Redirected to `/` |
+| `test_saved_recipes_requires_login` | Navigate to `/saved` without login | Redirected to `/` |
+
+### Explore
+
+| Test | Description | Expected |
+|------|-------------|----------|
+| `test_explore_shows_recipes_after_login` | Login then visit `/explore` | At least 1 recipe card visible |
+| `test_explore_recipe_links_to_details` | Click View on a recipe card | URL contains `/recipe/` |
+
+### Dashboard & Recipe Details
+
+| Test | Description | Expected |
+|------|-------------|----------|
+| `test_dashboard_loads_with_content` | Login and check dashboard | `'Selenium Chef'` visible in body |
+| `test_recipe_details_page_loads` | Navigate to a recipe | Recipe title `'Selenium Pasta'` visible |
+| `test_recipe_details_shows_author` | Navigate to a recipe | Author name `'Selenium Chef'` visible |
+
+### Social / Profile
+
+| Test | Description | Expected |
+|------|-------------|----------|
+| `test_following_page_loads` | Login and visit `/following` | URL contains `/following` |
+| `test_following_page_has_suggested_section` | Visit `/following` | `'Suggested accounts'` heading visible |
+| `test_profile_page_shows_display_name` | Login and visit `/profile` | `'Selenium Chef'` visible in body |
 
 ---
 
