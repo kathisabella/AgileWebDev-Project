@@ -125,15 +125,20 @@ Plateful-AgileWD-Project-2026/
 ├── ERD
 │   └── ERD_Plateful.png
 ├── main
-│   ├── __init__.py
-│   ├── config.py
-│   ├── mealplanner.py
-│   ├── routes.py
+│   ├── __init__.py          ← app factory, extension setup
+│   ├── blueprints.py        ← Blueprint registration
+│   ├── config.py            ← Config classes (Dev, Test, Selenium)
+│   ├── extensions.py        ← Shared extension instances
+│   ├── forms.py             ← WTForms form classes
+│   ├── mealplanner.py       ← Meal planner helpers
+│   ├── models.py            ← SQLAlchemy models
+│   ├── routes.py            ← All route handlers
 │   ├── static
 │   │   ├── login.js
 │   │   ├── profile.js
 │   │   ├── recipe_form.js
-│   │   └── styles.css
+│   │   ├── styles.css
+│   │   └── uploads/         ← User-uploaded recipe images
 │   └── templates
 │       ├── 404.html
 │       ├── base_auth.html
@@ -152,12 +157,17 @@ Plateful-AgileWD-Project-2026/
 │       ├── saved_recipe.html
 │       ├── settings.html
 │       ├── terms.html
-│       └── upload_recipe.html
+│       ├── upload_recipe.html
+│       └── user_profile.html
+├── tests
+│   ├── test_unit.py         ← 22 unit tests (in-memory SQLite)
+│   └── test_selenium.py     ← 6 Selenium end-to-end tests
+├── Testing.md
 ├── README.md
 └── requirements.txt
 ```
 
-> Note: The application uses a modular Flask structure where the main app is defined in `main/__init__.py` and routes are organised in `main/routes.py`.
+> The app uses a Blueprint-based Flask structure. The factory function lives in `main/__init__.py`, the Blueprint is registered in `main/blueprints.py`, and all route handlers are in `main/routes.py`.
 
 > Database Notes:
 > - SQLite is used for local development
@@ -169,19 +179,13 @@ Plateful-AgileWD-Project-2026/
 
 ## Tech Stack
 
-| Layer      | Technology                                        |
-|------------|---------------------------------------------------|
-| Backend    | Python · Flask                                    |
-| Database   | SQLite · SQLAlchemy · Flask-Migrate (Alembic)     |
-| Forms      | Flask-WTF · WTForms (with CSRF protection)        |
-| Auth       | Werkzeug password hashing · Flask sessions        |
-| Frontend   | HTML · CSS · JavaScript                           |
-| Templating | Jinja2                                            |
-| Fonts      | Google Fonts (Fraunces, Figtree)                  |
-
-
-## Further Documentation (To Be Changed)
-**This is for linking to additional user documentations (if there are any), else delete if not needed.**
-
-## License (To Be Changed)
-**If any were used, else delete if not needed.**
+| Layer        | Technology                                        |
+|--------------|---------------------------------------------------|
+| Backend      | Python · Flask                                    |
+| Database     | SQLite · SQLAlchemy · Flask-Migrate (Alembic)     |
+| Forms        | Flask-WTF · WTForms (with CSRF protection)        |
+| Auth         | Werkzeug password hashing · Flask sessions        |
+| Rate Limiting| Flask-Limiter                                     |
+| Frontend     | HTML · CSS · JavaScript                           |
+| Templating   | Jinja2                                            |
+| Fonts        | Google Fonts (Fraunces, Figtree)                  |

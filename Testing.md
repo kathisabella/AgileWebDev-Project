@@ -6,7 +6,7 @@ This document covers both automated and manual testing for the Plateful web appl
 
 **Test environment**
 - Python 3.12, Flask, SQLite (local dev)
-- Seed data: run `python seed.py` or call `create_test_data()` in Flask shell
+- Seed data: call `create_test_data()` in Flask shell (see README step 6)
 - Base URL: `http://localhost:5000`
 
 **Requirements**
