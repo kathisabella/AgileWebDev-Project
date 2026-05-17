@@ -85,6 +85,7 @@ class SystemTests(unittest.TestCase):
         self.driver.find_element(By.NAME, 'email').send_keys(email)
         self.driver.find_element(By.NAME, 'password').send_keys(password)
         self.driver.find_element(By.CSS_SELECTOR, '#panel-login button[type=submit]').click()
+        WebDriverWait(self.driver, 10).until(EC.url_changes(f'{BASE_URL}/'))
 
     # --- Authentication tests ---
 
@@ -111,21 +112,25 @@ class SystemTests(unittest.TestCase):
         self.login()
         logout_form = self.driver.find_element(By.CSS_SELECTOR, 'form[action*="logout"]')
         logout_form.find_element(By.CSS_SELECTOR, 'button[type=submit]').click()
+        WebDriverWait(self.driver, 10).until(EC.url_to_be(f'{BASE_URL}/'))
         self.assertEqual(self.driver.current_url, f'{BASE_URL}/',
                          'Logout should redirect to the login page')
 
     def test_signup_creates_account_and_redirects(self):
         self.driver.get(f'{BASE_URL}/')
-        # Tab button may be hidden until JS runs — use JS click
         signup_tab = self.driver.find_element(By.CSS_SELECTOR, '[data-tab="signup"]')
         self.driver.execute_script("arguments[0].click();", signup_tab)
-        self.driver.find_element(By.NAME, 'first_name').send_keys('Test')
-        self.driver.find_element(By.NAME, 'last_name').send_keys('User')
-        self.driver.find_element(By.NAME, 'username').send_keys('newseleniumuser')
-        self.driver.find_element(By.NAME, 'email').send_keys('newuser@plateful.com')
-        self.driver.find_element(By.NAME, 'password').send_keys('securepassword')
-        self.driver.find_element(By.NAME, 'accept_terms').click()
+        WebDriverWait(self.driver, 5).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, '#panel-signup input[name="first_name"]'))
+        )
+        self.driver.find_element(By.CSS_SELECTOR, '#panel-signup input[name="first_name"]').send_keys('Test')
+        self.driver.find_element(By.CSS_SELECTOR, '#panel-signup input[name="last_name"]').send_keys('User')
+        self.driver.find_element(By.CSS_SELECTOR, '#panel-signup input[name="username"]').send_keys('newseleniumuser')
+        self.driver.find_element(By.CSS_SELECTOR, '#panel-signup input[name="email"]').send_keys('newuser@plateful.com')
+        self.driver.find_element(By.CSS_SELECTOR, '#panel-signup input[name="password"]').send_keys('securepassword')
+        self.driver.find_element(By.CSS_SELECTOR, '#panel-signup input[name="accept_terms"]').click()
         self.driver.find_element(By.CSS_SELECTOR, '#panel-signup button[type=submit]').click()
+        WebDriverWait(self.driver, 10).until(EC.url_contains('/dashboard'))
         self.assertIn('/dashboard', self.driver.current_url,
                       'Successful signup should redirect to dashboard')
 
@@ -165,6 +170,7 @@ class SystemTests(unittest.TestCase):
         self.driver.get(f'{BASE_URL}/explore')
         view_btn = self.driver.find_element(By.CSS_SELECTOR, '.recipe-card .btn')
         view_btn.click()
+        WebDriverWait(self.driver, 10).until(EC.url_contains('/recipe/'))
         self.assertIn('/recipe/', self.driver.current_url,
                       'Clicking View on a recipe card should navigate to recipe details')
 
@@ -185,6 +191,7 @@ class SystemTests(unittest.TestCase):
         self.driver.get(f'{BASE_URL}/explore')
         view_btn = self.driver.find_element(By.CSS_SELECTOR, '.recipe-card .btn')
         view_btn.click()
+        WebDriverWait(self.driver, 10).until(EC.url_contains('/recipe/'))
         body = self.driver.find_element(By.TAG_NAME, 'body').text
         self.assertIn('Selenium Pasta', body,
                       'Recipe details page should display the recipe title')
@@ -194,6 +201,7 @@ class SystemTests(unittest.TestCase):
         self.driver.get(f'{BASE_URL}/explore')
         view_btn = self.driver.find_element(By.CSS_SELECTOR, '.recipe-card .btn')
         view_btn.click()
+        WebDriverWait(self.driver, 10).until(EC.url_contains('/recipe/'))
         body = self.driver.find_element(By.TAG_NAME, 'body').text
         self.assertIn('Selenium Chef', body,
                       'Recipe details page should display the author name')

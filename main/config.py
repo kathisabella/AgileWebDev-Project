@@ -20,4 +20,5 @@ class SeleniumTestConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///selenium_test.db'
     TESTING = True
     WTF_CSRF_ENABLED = False
+    RATELIMIT_ENABLED = False
 
