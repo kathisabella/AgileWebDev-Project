@@ -259,6 +259,20 @@ class UserModelTests(unittest.TestCase):
         self.assertEqual(result.related_user_id, user1.id,
                          'Activity should reference the correct followed user')
 
+    def test_activity_recorded_for_save(self):
+        user = User.query.filter_by(username='foodlover').first()
+        recipe = Recipe.query.filter_by(title='Test Pasta').first()
+        db.session.add(Activity(
+            user_id=user.id,
+            activity_type='saved_recipe',
+            related_recipe_id=recipe.id
+        ))
+        db.session.commit()
+        result = Activity.query.filter_by(user_id=user.id, activity_type='saved_recipe').first()
+        self.assertIsNotNone(result, 'Activity record should exist after saving a recipe')
+        self.assertEqual(result.related_recipe_id, recipe.id,
+                         'Activity should reference the correct saved recipe')
+
     def test_multiple_activities_for_user(self):
         user = User.query.filter_by(username='testchef').first()
         recipe = Recipe.query.filter_by(title='Test Pasta').first()

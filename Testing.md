@@ -28,7 +28,7 @@ python -m pytest tests/test_selenium.py -v
 
 ## Automated Unit Tests (`tests/test_unit.py`)
 
-All 24 tests use an in-memory SQLite database (`sqlite:///:memory:`) via `TestConfig`.
+All 25 tests use an in-memory SQLite database (`sqlite:///:memory:`) via `TestConfig`.
 Each test class creates a fresh DB in `setUp` and drops it in `tearDown`.
 
 ### Password & Authentication
@@ -88,13 +88,14 @@ Each test class creates a fresh DB in `setUp` and drops it in `tearDown`.
 |------|-------------|----------|
 | `test_activity_recorded_for_upload` | Log `uploaded_recipe` activity | Row exists with correct `related_recipe_id` |
 | `test_activity_recorded_for_follow` | Log `followed_user` activity | Row exists with correct `related_user_id` |
+| `test_activity_recorded_for_save` | Log `saved_recipe` activity | Row exists with correct `related_recipe_id` |
 | `test_multiple_activities_for_user` | Log 2 activities for same user | Count is `2` |
 
 ---
 
 ## Automated Selenium Tests (`tests/test_selenium.py`)
 
-All 17 tests use a file-based SQLite DB (`sqlite:///selenium_test.db`) via `SeleniumTestConfig`.
+All 21 tests use a file-based SQLite DB (`sqlite:///selenium_test.db`) via `SeleniumTestConfig`.
 Flask runs on a daemon thread at `http://localhost:5001`. Chrome runs headless.
 
 ### Authentication
@@ -123,6 +124,12 @@ Flask runs on a daemon thread at `http://localhost:5001`. Chrome runs headless.
 | `test_explore_shows_recipes_after_login` | Login then visit `/explore` | At least 1 recipe card visible |
 | `test_explore_recipe_links_to_details` | Click View on a recipe card | URL contains `/recipe/` |
 
+### My Recipes
+
+| Test | Description | Expected |
+|------|-------------|----------|
+| `test_my_recipes_page_loads` | Login and visit `/my-recipes` | `'Selenium Pasta'` visible in body |
+
 ### Dashboard & Recipe Details
 
 | Test | Description | Expected |
@@ -131,12 +138,20 @@ Flask runs on a daemon thread at `http://localhost:5001`. Chrome runs headless.
 | `test_recipe_details_page_loads` | Navigate to a recipe | Recipe title `'Selenium Pasta'` visible |
 | `test_recipe_details_shows_author` | Navigate to a recipe | Author name `'Selenium Chef'` visible |
 
+### Save / Saved Recipes
+
+| Test | Description | Expected |
+|------|-------------|----------|
+| `test_save_recipe` | Click Save on a recipe | `'Saved'` status visible on recipe page |
+| `test_saved_recipes_page_shows_saved_recipe` | Save a recipe then visit `/saved` | `'Selenium Pasta'` visible in saved list |
+
 ### Social / Profile
 
 | Test | Description | Expected |
 |------|-------------|----------|
 | `test_following_page_loads` | Login and visit `/following` | URL contains `/following` |
 | `test_following_page_has_suggested_section` | Visit `/following` | `'Suggested accounts'` heading visible |
+| `test_follow_user_from_following_page` | Click Follow on a suggested user | Followed user visible on the Following page |
 | `test_profile_page_shows_display_name` | Login and visit `/profile` | `'Selenium Chef'` visible in body |
 
 ---

@@ -174,6 +174,15 @@ class SystemTests(unittest.TestCase):
         self.assertIn('/recipe/', self.driver.current_url,
                       'Clicking View on a recipe card should navigate to recipe details')
 
+    # --- My Recipes tests ---
+
+    def test_my_recipes_page_loads(self):
+        self.login()
+        self.driver.get(f'{BASE_URL}/my-recipes')
+        body = self.driver.find_element(By.TAG_NAME, 'body').text
+        self.assertIn('Selenium Pasta', body,
+                      'My Recipes page should display recipes created by the logged-in user')
+
     # --- Dashboard tests ---
 
     def test_dashboard_loads_with_content(self):
@@ -206,6 +215,35 @@ class SystemTests(unittest.TestCase):
         self.assertIn('Selenium Chef', body,
                       'Recipe details page should display the author name')
 
+    # --- Save / saved tests ---
+
+    def test_save_recipe(self):
+        self.login()
+        self.driver.get(f'{BASE_URL}/explore')
+        view_btn = self.driver.find_element(By.CSS_SELECTOR, '.recipe-card .btn')
+        view_btn.click()
+        WebDriverWait(self.driver, 10).until(EC.url_contains('/recipe/'))
+        save_btn = self.driver.find_element(By.CSS_SELECTOR, 'form[action$="/save"] button[type=submit]')
+        save_btn.click()
+        WebDriverWait(self.driver, 10).until(EC.url_contains('/recipe/'))
+        body = self.driver.find_element(By.TAG_NAME, 'body').text
+        self.assertIn('Saved', body,
+                      'Recipe page should show saved status after clicking Save')
+
+    def test_saved_recipes_page_shows_saved_recipe(self):
+        self.login()
+        self.driver.get(f'{BASE_URL}/explore')
+        view_btn = self.driver.find_element(By.CSS_SELECTOR, '.recipe-card .btn')
+        view_btn.click()
+        WebDriverWait(self.driver, 10).until(EC.url_contains('/recipe/'))
+        save_btn = self.driver.find_element(By.CSS_SELECTOR, 'form[action$="/save"] button[type=submit]')
+        save_btn.click()
+        WebDriverWait(self.driver, 10).until(EC.url_contains('/recipe/'))
+        self.driver.get(f'{BASE_URL}/saved')
+        body = self.driver.find_element(By.TAG_NAME, 'body').text
+        self.assertIn('Selenium Pasta', body,
+                      'Saved recipes page should display the recipe that was just saved')
+
     # --- Social / following tests ---
 
     def test_following_page_loads(self):
@@ -220,6 +258,16 @@ class SystemTests(unittest.TestCase):
         body = self.driver.find_element(By.TAG_NAME, 'body').text
         self.assertIn('Suggested accounts', body,
                       'Following page should display the Suggested accounts section')
+
+    def test_follow_user_from_following_page(self):
+        self.login()
+        self.driver.get(f'{BASE_URL}/following')
+        follow_btn = self.driver.find_element(By.CSS_SELECTOR, 'form[action*="/follow/"] button[type=submit]')
+        follow_btn.click()
+        WebDriverWait(self.driver, 10).until(EC.url_contains('/following'))
+        body = self.driver.find_element(By.TAG_NAME, 'body').text
+        self.assertIn('Selenium Fan', body,
+                      'Followed user should appear on the Following page after being followed')
 
     # --- Profile tests ---
 
