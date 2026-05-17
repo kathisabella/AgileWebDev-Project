@@ -218,27 +218,35 @@ class SystemTests(unittest.TestCase):
     # --- Save / saved tests ---
 
     def test_save_recipe(self):
-        self.login()
+        # Login as seleniumfan — Save button is hidden for the recipe's own author
+        self.login(email='fan@plateful.com', password='fanpassword')
         self.driver.get(f'{BASE_URL}/explore')
         view_btn = self.driver.find_element(By.CSS_SELECTOR, '.recipe-card .btn')
         view_btn.click()
         WebDriverWait(self.driver, 10).until(EC.url_contains('/recipe/'))
         save_btn = self.driver.find_element(By.CSS_SELECTOR, 'form[action$="/save"] button[type=submit]')
         save_btn.click()
-        WebDriverWait(self.driver, 10).until(EC.url_contains('/recipe/'))
+        # Wait for page reload — unsave form only appears after save completes
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, 'form[action$="/unsave"]'))
+        )
         body = self.driver.find_element(By.TAG_NAME, 'body').text
         self.assertIn('Saved', body,
                       'Recipe page should show saved status after clicking Save')
 
     def test_saved_recipes_page_shows_saved_recipe(self):
-        self.login()
+        # Login as seleniumfan — Save button is hidden for the recipe's own author
+        self.login(email='fan@plateful.com', password='fanpassword')
         self.driver.get(f'{BASE_URL}/explore')
         view_btn = self.driver.find_element(By.CSS_SELECTOR, '.recipe-card .btn')
         view_btn.click()
         WebDriverWait(self.driver, 10).until(EC.url_contains('/recipe/'))
         save_btn = self.driver.find_element(By.CSS_SELECTOR, 'form[action$="/save"] button[type=submit]')
         save_btn.click()
-        WebDriverWait(self.driver, 10).until(EC.url_contains('/recipe/'))
+        # Wait for page reload — unsave form only appears after save completes
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, 'form[action$="/unsave"]'))
+        )
         self.driver.get(f'{BASE_URL}/saved')
         body = self.driver.find_element(By.TAG_NAME, 'body').text
         self.assertIn('Selenium Pasta', body,
